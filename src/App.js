@@ -1,15 +1,16 @@
 import React, { useEffect } from "react";
 import "./app.scss";
 import AppTable from "./components/AppTable";
-import json from "./initData.json";
+import { initLS } from "./functions/localStorageFunctions";
+import initialData from "./initData.json";
 
-const initialData = json;
+const lsKey = "app-data";
 
 function App() {
   useEffect(() => {
-    // initData();
-    console.log(initialData);
-  });
+    initLS(lsKey, initialData);
+    // console.log(initialData);
+  }, []);
 
   return (
     <>
