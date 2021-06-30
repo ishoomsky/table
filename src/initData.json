@@ -1,0 +1,17 @@
+[
+    {
+        "name": "Василий Пупкин",
+        "balance": 21,
+        "isActive": true
+    },
+    {
+        "name": "Максим Морозов",
+        "balance": 0,
+        "isActive": false
+    },
+    {
+        "name": "Кот Матроскин",
+        "balance": 50,
+        "isActive": true
+    }
+]
