@@ -3,6 +3,7 @@ import AppTable from "./components/AppTable";
 import { initLS } from "./functions/localStorageFunctions";
 import initialData from "./initData.json";
 
+
 const lsKey = "app-data";
 
 function App() {
