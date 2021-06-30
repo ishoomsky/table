@@ -2,19 +2,25 @@
   {
     "id": 0,
     "name": "Василий Пупкин",
+    "group": 1,
     "balance": 21,
-    "isActive": true
+    "isActive": true,
+    "note": ""
   },
   {
     "id": 1,
     "name": "Максим Морозов",
+    "group": 2,
     "balance": 0,
-    "isActive": false
+    "isActive": false,
+    "note": ""
   },
   {
     "id": 2,
+    "group": 0,
     "name": "Кот Матроскин",
     "balance": 50,
-    "isActive": true
+    "isActive": true,
+    "note": ""
   }
 ]
