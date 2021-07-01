@@ -1,24 +1,24 @@
 [
   {
     "id": 0,
-    "name": "Василий Пупкин",
-    "group": 1,
+    "name": "Vasiliy Pupkin",
+    "group": "client",
     "balance": 21,
     "status": true,
     "note": "Lorem Ipsum is simply dummy text of the printing and typesetting industry."
   },
   {
     "id": 1,
-    "name": "Максим Морозов",
-    "group": 2,
+    "name": "Maxim Morozov",
+    "group": "partner",
     "balance": 0,
     "status": false,
     "note": "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout."
   },
   {
     "id": 222,
-    "group": 0,
-    "name": "Кот Матроскин",
+    "group": "employee",
+    "name": "Bob Barnes",
     "balance": 50,
     "status": true,
     "note": "Contrary to popular belief, Lorem Ipsum is not simply random text."
