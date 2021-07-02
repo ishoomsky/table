@@ -10,7 +10,10 @@ import {
   RadioButtonGroup,
   RadioButton,
   TextArea,
+  Loading,
 } from "carbon-components-react";
+
+import { generateRandomId } from "../../functions/generateRandomId";
 
 export default function AddUserModal({
   isOpen,
@@ -18,26 +21,46 @@ export default function AddUserModal({
   setViewState,
   userGroups,
 }) {
-  const [componentViewState, setComponentViewState] = useState(0); //0 - normal view, loading view
+  const [isLoading, setIsLoading] = useState(false); //0 - normal view, 1 - loading view
   const [name, setName] = useState("");
-  const [group, setGroup] = useState("");
+  const [group, setGroup] = useState("placeholder-item");
   const [balance, setBalance] = useState(0);
-  const [status, setStatus] = useState(null);
+  const [status, setStatus] = useState("");
   const [note, setNote] = useState("");
 
+  const resetModalForm = () => {
+    setName("");
+    setGroup("placeholder-item");
+    setBalance(0);
+    setStatus("");
+    setNote("");
+  };
+
   const handleSubmit = () => {
-    console.log({
+    const newUser = {
+      id: generateRandomId(),
       name: name,
       group: group,
       balance: balance,
       status: status === "radio-1" ? true : false,
       note: note,
-    });
+    };
+
+    setIsLoading(true);
+    setTimeout(() => {
+      handleAddUser(newUser);
+      setIsLoading(false);
+      resetModalForm();
+      setViewState(0);
+    }, 200);
   };
 
   const handleCancel = () => {
     console.log("handleCancel");
-    setName("1123123123123");
+    setTimeout(() => {
+      resetModalForm();
+    }, 300);
+    setViewState(0);
   };
 
   return (
@@ -47,26 +70,30 @@ export default function AddUserModal({
       secondaryButtonText={"Cancel"}
       open={isOpen}
       onRequestClose={handleCancel}
-      onRequestSubmit={() => handleSubmit()}
+      onRequestSubmit={handleSubmit}
       onSecondarySubmit={handleCancel}
     >
+      <Loading active={isLoading} />
       <Form>
+        <Loading active={false} />
         <TextInput
-          id="user-name"
           onChange={(e) => setName(e.target.value)}
+          value={name}
+          id="user-name"
           labelText="Enter name"
-          defaultValue={name}
           placeholder="John Doe"
-          // style={{ marginBottom: "1rem" }}
+          style={{ marginBottom: "1rem" }}
           data-modal-primary-focus
+          autoComplete={"off"}
         />
 
         <Select
-          id="user-group"
           onChange={(e) => setGroup(e.target.value)}
+          value={group}
+          id="user-group"
           labelText="Choose an group"
-          defaultValue="placeholder-item"
           style={{ marginBottom: "1rem" }}
+          autoComplete={"off"}
         >
           <SelectItem
             disabled
@@ -80,33 +107,34 @@ export default function AddUserModal({
         </Select>
 
         <TextInput
+          onChange={(e) => setBalance(e.target.value)}
+          value={balance}
           id="user-balance"
           labelText="Enter balance, BYN"
-          onChange={(e) => setBalance(e.target.value)}
-          defaultValue={balance}
           placeholder="0"
+          autoComplete={"off"}
         />
         <FormGroup legendText="Choose user's status">
           <RadioButtonGroup
             onChange={(value) => setStatus(value)}
-            orientation={"horizontal"}
+            valueSelected={status}
             name="user-status"
-            defaultSelected={status}
           >
-            <RadioButton labelText="Active" value={"radio-1"} id="radio-1" />
+            <RadioButton labelText="Active" value="radio-1" name="radio-1" />
             <RadioButton
               labelText="Not active"
-              value={"radio-2"}
-              id="radio-2"
+              value="radio-2"
+              name="radio-2"
             />
           </RadioButtonGroup>
         </FormGroup>
 
         <TextArea
-          labelText={"asdfasdf"}
           onChange={(e) => setNote(e.target.value)}
           value={note}
-          rows={4}
+          labelText={"Note"}
+          rows={2}
+          autoComplete={"off"}
         />
       </Form>
     </Modal>

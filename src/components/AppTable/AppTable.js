@@ -11,24 +11,27 @@ import {
   TableHeader,
   TableBody,
   TableCell,
-  Checkbox,
   TableToolbar,
   TableToolbarContent,
   Button,
 } from "carbon-components-react";
 
+import { Edit16, Delete16 } from "@carbon/icons-react";
+
 import AddUserModal from "../AddUserModal";
 
 export default function AppTable() {
-  const [rowData, setRowData] = useState([]);
+  const [users, setUsers] = useState([]);
   const [viewState, setViewState] = useState(0); // 0 - normal view, 1 - edit view, 2 - delete view, 3 - adding view
   const [userGroups, setUserGroups] = useState([]);
 
   useEffect(() => {
     const data = getLS();
-    setRowData(data);
-    const groups = data.map(({ group }) => group);
-    setUserGroups(groups);
+    setUsers(data);
+
+    const groups = new Set([]);
+    data?.forEach(({ group }) => groups.add(group));
+    setUserGroups([...groups]);
   }, []);
 
   const headers = [
@@ -52,29 +55,34 @@ export default function AppTable() {
       key: "note",
       header: "Note",
     },
+    {
+      key: "controls",
+      header: "",
+    },
   ];
 
   const handleAddUser = (newUser) => {
-    const newRowData = [...rowData, newUser];
-    setRowData(newRowData);
+    const newUsers = [...users, newUser];
+    setUsers(newUsers);
+    setLS(newUsers);
   };
   const handleEditUser = () => {};
   const handleDeleteUser = () => {};
   const handleChangeStatus = (id) => {
-    const newRowData = [...rowData];
+    const newUsers = [...users];
 
-    const updatingIndex = newRowData.findIndex((row) => row.id === id);
-    const updatingRow = newRowData[updatingIndex];
+    const updatingIndex = newUsers.findIndex((row) => row.id === id);
+    const updatingRow = newUsers[updatingIndex];
 
     const newStatus = !updatingRow.status;
 
-    newRowData.splice(updatingIndex, 1, {
+    newUsers.splice(updatingIndex, 1, {
       ...updatingRow,
       status: newStatus,
     });
 
-    setRowData(newRowData);
-    setLS(newRowData);
+    setUsers(newUsers);
+    setLS(newUsers);
   };
   const handleChangeGroup = () => {};
 
@@ -86,7 +94,7 @@ export default function AppTable() {
         handleAddUser={handleAddUser}
         userGroups={userGroups}
       />
-      <DataTable rows={rowData} headers={headers}>
+      <DataTable rows={users} headers={headers}>
         {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
           <TableContainer>
             <TableToolbar>
@@ -108,24 +116,56 @@ export default function AppTable() {
                 {rows.map((row) => (
                   <TableRow {...getRowProps({ row })}>
                     {row.cells.map((cell) => {
-                      if (cell.info.header === "status") {
-                        return (
-                          <TableCell
-                            style={{
-                              color: cell.value ? "green" : "maroon",
-                            }}
-                            key={cell.id}
-                          >
-                            {cell.value ? "Active" : "Not active"}
-                          </TableCell>
-                        );
+                      switch (cell.info.header) {
+                        case "status":
+                          return (
+                            <TableCell
+                              style={{
+                                color: cell.value ? "green" : "maroon",
+                              }}
+                              key={cell.id}
+                            >
+                              {cell.value ? "Active" : "Not active"}
+                            </TableCell>
+                          );
+                        case "balance":
+                          return (
+                            <TableCell key={cell.id}>
+                              {cell.value} BYN
+                            </TableCell>
+                          );
+                        case "controls":
+                          return (
+                            <TableCell
+                              style={{
+                                display: "flex",
+                                gap: "5px",
+                              }}
+                              key={cell.id}
+                            >
+                              <Button
+                                renderIcon={Edit16}
+                                iconDescription="Edit"
+                                hasIconOnly
+                                onClick={() =>
+                                  console.log("edit click " + row.id)
+                                }
+                              />
+                              <Button
+                                renderIcon={Delete16}
+                                iconDescription="Delete"
+                                hasIconOnly
+                                onClick={() =>
+                                  console.log("del click " + row.id)
+                                }
+                              />
+                            </TableCell>
+                          );
+                        default:
+                          return (
+                            <TableCell key={cell.id}>{cell.value}</TableCell>
+                          );
                       }
-                      if (cell.info.header === "balance") {
-                        return (
-                          <TableCell key={cell.id}>{cell.value} BYN</TableCell>
-                        );
-                      }
-                      return <TableCell key={cell.id}>{cell.value}</TableCell>;
                     })}
                   </TableRow>
                 ))}
