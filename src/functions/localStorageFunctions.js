@@ -1,17 +1,17 @@
 const lsKey = "app-data";
 
-export const initLS = (_data, key = lsKey) => {
+export const initLS = (_data) => {
   const data = JSON.stringify(_data);
-  if (localStorage.getItem(key) === null) {
-    localStorage.setItem((key = lsKey), data);
+  if (localStorage.getItem(lsKey) === null) {
+    localStorage.setItem(lsKey, data);
   }
 };
 
-export const getLS = (key = lsKey) => {
-  return JSON.parse(localStorage.getItem(key));
+export const getLS = () => {
+  return JSON.parse(localStorage.getItem(lsKey));
 };
 
-export const setLS = (_data, key = lsKey) => {
+export const setLS = (_data) => {
   const data = JSON.stringify(_data);
-  localStorage.setItem(key, data);
+  localStorage.setItem(lsKey, data);
 };

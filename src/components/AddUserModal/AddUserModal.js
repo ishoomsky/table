@@ -16,9 +16,9 @@ import {
 import { generateRandomId } from "../../functions/generateRandomId";
 
 export default function AddUserModal({
-  isOpen,
+  isModalOpen,
   handleAddUser,
-  setViewState,
+  setModalOpen,
   userGroups,
 }) {
   const [isLoading, setIsLoading] = useState(false); //0 - normal view, 1 - loading view
@@ -51,31 +51,28 @@ export default function AddUserModal({
       handleAddUser(newUser);
       setIsLoading(false);
       resetModalForm();
-      setViewState(0);
+      setModalOpen(false);
     }, 200);
   };
 
   const handleCancel = () => {
     console.log("handleCancel");
-    setTimeout(() => {
-      resetModalForm();
-    }, 300);
-    setViewState(0);
+    resetModalForm();
+    setModalOpen(false);
   };
 
-  return (
+  const modal = isModalOpen && (
     <Modal
       modalHeading={"Add user"}
       primaryButtonText={"Apply and add"}
       secondaryButtonText={"Cancel"}
-      open={isOpen}
+      open={isModalOpen}
       onRequestClose={handleCancel}
       onRequestSubmit={handleSubmit}
       onSecondarySubmit={handleCancel}
     >
       <Loading active={isLoading} />
       <Form>
-        <Loading active={false} />
         <TextInput
           onChange={(e) => setName(e.target.value)}
           value={name}
@@ -139,11 +136,17 @@ export default function AddUserModal({
       </Form>
     </Modal>
   );
+
+  return modal;
 }
 
+AddUserModal.defaultProps = {
+  userGroups: [],
+};
+
 AddUserModal.propTypes = {
-  open: PropTypes.bool,
+  open: PropTypes.bool.isRequired,
   userGroups: PropTypes.array,
   handleAddUser: PropTypes.func,
-  setViewState: PropTypes.func,
+  setModalOpen: PropTypes.func,
 };

@@ -22,11 +22,12 @@ import AddUserModal from "../AddUserModal";
 
 export default function AppTable() {
   const [users, setUsers] = useState([]);
-  const [viewState, setViewState] = useState(0); // 0 - normal view, 1 - edit view, 2 - delete view, 3 - adding view
+  const [isAddModalOpen, setAddModalOpen] = useState(false);
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
   const [userGroups, setUserGroups] = useState([]);
 
   useEffect(() => {
-    const data = getLS();
+    const data = getLS() || [];
     setUsers(data);
 
     const groups = new Set([]);
@@ -86,94 +87,143 @@ export default function AppTable() {
   };
   const handleChangeGroup = () => {};
 
+  const tableHead = (
+    <TableHead>
+      <TableRow>
+        {headers.map((header) => (
+          <TableHeader>{header.header}</TableHeader>
+        ))}
+      </TableRow>
+    </TableHead>
+  );
+
+  const dataTable = (
+    <DataTable rows={users} headers={headers}>
+      {({ rows, getRowProps }) => (
+        <TableContainer>
+          <TableToolbar>
+            <TableToolbarContent>
+              <Button onClick={() => setAddModalOpen(true)}>Add user</Button>
+            </TableToolbarContent>
+          </TableToolbar>
+          <Table>
+            {tableHead}
+            <TableBody>
+              {rows.map((row) => (
+                <TableRow {...getRowProps({ row })}>
+                  {row.cells.map((cell) => {
+                    switch (cell.info.header) {
+                      case "status":
+                        return (
+                          <TableCell
+                            style={{
+                              color: cell.value ? "green" : "maroon",
+                            }}
+                            key={cell.id}
+                          >
+                            {cell.value ? "Active" : "Not active"}
+                          </TableCell>
+                        );
+                      case "balance":
+                        return (
+                          <TableCell key={cell.id}>{cell.value} BYN</TableCell>
+                        );
+                      case "controls":
+                        return (
+                          <TableCell
+                            style={{
+                              display: "flex",
+                              gap: "5px",
+                            }}
+                            key={cell.id}
+                          >
+                            <Button
+                              renderIcon={Edit16}
+                              iconDescription="Edit"
+                              hasIconOnly
+                              onClick={() =>
+                                console.log("edit click " + row.id)
+                              }
+                            />
+                            <Button
+                              renderIcon={Delete16}
+                              iconDescription="Delete"
+                              hasIconOnly
+                              onClick={() => console.log("del click " + row.id)}
+                            />
+                          </TableCell>
+                        );
+                      default:
+                        return (
+                          <TableCell key={cell.id}>{cell.value}</TableCell>
+                        );
+                    }
+                  })}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+    </DataTable>
+  );
+
+  // const tableRows = users.map((user) => (
+  //   <TableRow {...getRowProps({ row })}>
+  //     {row.cells.map((cell) => {
+  //       switch (cell.info.header) {
+  //         case "status":
+  //           return (
+  //             <TableCell
+  //               style={{
+  //                 color: cell.value ? "green" : "maroon",
+  //               }}
+  //               key={cell.id}
+  //             >
+  //               {cell.value ? "Active" : "Not active"}
+  //             </TableCell>
+  //           );
+  //         case "balance":
+  //           return <TableCell key={cell.id}>{cell.value} BYN</TableCell>;
+  //         case "controls":
+  //           return (
+  //             <TableCell
+  //               style={{
+  //                 display: "flex",
+  //                 gap: "5px",
+  //               }}
+  //               key={cell.id}
+  //             >
+  //               <Button
+  //                 renderIcon={Edit16}
+  //                 iconDescription="Edit"
+  //                 hasIconOnly
+  //                 onClick={() => console.log("edit click " + row.id)}
+  //               />
+  //               <Button
+  //                 renderIcon={Delete16}
+  //                 iconDescription="Delete"
+  //                 hasIconOnly
+  //                 onClick={() => console.log("del click " + row.id)}
+  //               />
+  //             </TableCell>
+  //           );
+  //         default:
+  //           return <TableCell key={cell.id}>{cell.value}</TableCell>;
+  //       }
+  //     })}
+  //   </TableRow>
+  // ));
+
   return (
     <Grid>
       <AddUserModal
-        isOpen={viewState === 3 && true}
-        setViewState={setViewState}
+        isModalOpen={isAddModalOpen}
+        setModalOpen={setAddModalOpen}
         handleAddUser={handleAddUser}
         userGroups={userGroups}
       />
-      <DataTable rows={users} headers={headers}>
-        {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-          <TableContainer>
-            <TableToolbar>
-              <TableToolbarContent>
-                <Button onClick={() => setViewState(3)}>Add user</Button>
-              </TableToolbarContent>
-            </TableToolbar>
-            <Table {...getTableProps()}>
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow {...getRowProps({ row })}>
-                    {row.cells.map((cell) => {
-                      switch (cell.info.header) {
-                        case "status":
-                          return (
-                            <TableCell
-                              style={{
-                                color: cell.value ? "green" : "maroon",
-                              }}
-                              key={cell.id}
-                            >
-                              {cell.value ? "Active" : "Not active"}
-                            </TableCell>
-                          );
-                        case "balance":
-                          return (
-                            <TableCell key={cell.id}>
-                              {cell.value} BYN
-                            </TableCell>
-                          );
-                        case "controls":
-                          return (
-                            <TableCell
-                              style={{
-                                display: "flex",
-                                gap: "5px",
-                              }}
-                              key={cell.id}
-                            >
-                              <Button
-                                renderIcon={Edit16}
-                                iconDescription="Edit"
-                                hasIconOnly
-                                onClick={() =>
-                                  console.log("edit click " + row.id)
-                                }
-                              />
-                              <Button
-                                renderIcon={Delete16}
-                                iconDescription="Delete"
-                                hasIconOnly
-                                onClick={() =>
-                                  console.log("del click " + row.id)
-                                }
-                              />
-                            </TableCell>
-                          );
-                        default:
-                          return (
-                            <TableCell key={cell.id}>{cell.value}</TableCell>
-                          );
-                      }
-                    })}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </DataTable>
+      {dataTable}
     </Grid>
   );
 }
