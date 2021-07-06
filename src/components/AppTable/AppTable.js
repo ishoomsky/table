@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { setLS, getLS } from "../../functions/localStorageFunctions";
-
 import {
   Grid,
+  Row,
+  Column,
   DataTable,
   TableContainer,
   Table,
@@ -15,16 +16,18 @@ import {
   TableToolbarContent,
   Button,
 } from "carbon-components-react";
-
 import { Edit16, Delete16 } from "@carbon/icons-react";
 
 import AddUserModal from "../AddUserModal";
+import Notification from "../Notification";
 
 export default function AppTable() {
   const [users, setUsers] = useState([]);
-  const [isAddModalOpen, setAddModalOpen] = useState(false);
-  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [userGroups, setUserGroups] = useState([]);
+
+  const [notification, setNotification] = useState(null);
 
   useEffect(() => {
     const data = getLS() || [];
@@ -87,15 +90,16 @@ export default function AppTable() {
   };
   const handleChangeGroup = () => {};
 
-  const tableHead = (
-    <TableHead>
-      <TableRow>
-        {headers.map((header) => (
-          <TableHeader>{header.header}</TableHeader>
-        ))}
-      </TableRow>
-    </TableHead>
-  );
+  const handleSetNotification = (value) => {
+    if (value) {
+      setNotification(value);
+      setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+      return;
+    }
+    setNotification(null);
+  };
 
   const dataTable = (
     <DataTable rows={users} headers={headers}>
@@ -107,7 +111,13 @@ export default function AppTable() {
             </TableToolbarContent>
           </TableToolbar>
           <Table>
-            {tableHead}
+            <TableHead>
+              <TableRow>
+                {headers.map(({ header }) => (
+                  <TableHeader key={header}>{header}</TableHeader>
+                ))}
+              </TableRow>
+            </TableHead>
             <TableBody>
               {rows.map((row) => (
                 <TableRow {...getRowProps({ row })}>
@@ -168,60 +178,20 @@ export default function AppTable() {
     </DataTable>
   );
 
-  // const tableRows = users.map((user) => (
-  //   <TableRow {...getRowProps({ row })}>
-  //     {row.cells.map((cell) => {
-  //       switch (cell.info.header) {
-  //         case "status":
-  //           return (
-  //             <TableCell
-  //               style={{
-  //                 color: cell.value ? "green" : "maroon",
-  //               }}
-  //               key={cell.id}
-  //             >
-  //               {cell.value ? "Active" : "Not active"}
-  //             </TableCell>
-  //           );
-  //         case "balance":
-  //           return <TableCell key={cell.id}>{cell.value} BYN</TableCell>;
-  //         case "controls":
-  //           return (
-  //             <TableCell
-  //               style={{
-  //                 display: "flex",
-  //                 gap: "5px",
-  //               }}
-  //               key={cell.id}
-  //             >
-  //               <Button
-  //                 renderIcon={Edit16}
-  //                 iconDescription="Edit"
-  //                 hasIconOnly
-  //                 onClick={() => console.log("edit click " + row.id)}
-  //               />
-  //               <Button
-  //                 renderIcon={Delete16}
-  //                 iconDescription="Delete"
-  //                 hasIconOnly
-  //                 onClick={() => console.log("del click " + row.id)}
-  //               />
-  //             </TableCell>
-  //           );
-  //         default:
-  //           return <TableCell key={cell.id}>{cell.value}</TableCell>;
-  //       }
-  //     })}
-  //   </TableRow>
-  // ));
-
   return (
     <Grid>
+      {notification && (
+        <Notification
+          notification={notification}
+          setNotification={handleSetNotification}
+        />
+      )}
       <AddUserModal
-        isModalOpen={isAddModalOpen}
+        modalOpen={addModalOpen}
         setModalOpen={setAddModalOpen}
         handleAddUser={handleAddUser}
         userGroups={userGroups}
+        setNotification={handleSetNotification}
       />
       {dataTable}
     </Grid>
