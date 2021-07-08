@@ -32,21 +32,31 @@ const validationSchema = Yup.object().shape({
 export default function EditUserModal({
   modalOpen,
   setModalOpen,
-  handleAddUser,
+  handleEditUser,
   userGroups,
   setNotification,
+  currentUser,
 }) {
   const [modalLoading, setModalLoading] = useState(false);
   const [allFieldsValid, setAllFieldsValid] = useState(false);
+
+  const {
+    id: userId,
+    name: userName,
+    group: userGroup,
+    balance: userBalance,
+    status: userStatus,
+    note: userNote,
+  } = currentUser;
+
   const formik = useFormik({
     initialValues: {
-      name: "",
-      group: "",
-      balance: "",
-      status: "",
-      note: "",
+      name: userName,
+      group: userGroup,
+      balance: userBalance,
+      status: userStatus ? "radio-1" : "radio-2",
+      note: userNote,
     },
-    // validateOnChange: validateState,
     validationSchema: validationSchema,
     onSubmit: (values) => {
       handleSubmit(values);
@@ -54,29 +64,33 @@ export default function EditUserModal({
   });
 
   useEffect(() => {
-    formik.validateForm().then((errors) => {
-      if (allFieldsValid) {
-        if (
-          !(
-            errors &&
-            Object.keys(errors).length === 0 &&
-            errors.constructor === Object
-          )
-        ) {
-          setAllFieldsValid(false);
+    if (modalOpen) {
+      formik.validateForm().then((errors) => {
+        if (allFieldsValid) {
+          if (
+            !(
+              errors &&
+              Object.keys(errors).length === 0 &&
+              errors.constructor === Object
+            )
+          ) {
+            setAllFieldsValid(false);
+          }
         }
-      }
 
-      //resolving to errors object, and if it empty, change validateState to true
-      if (
-        errors &&
-        Object.keys(errors).length === 0 &&
-        errors.constructor === Object
-      ) {
-        setAllFieldsValid(true);
-        return;
-      }
-    });
+        //resolving to errors object, and if it empty, change validateState to true
+        if (
+          errors &&
+          Object.keys(errors).length === 0 &&
+          errors.constructor === Object
+        ) {
+          setAllFieldsValid(true);
+          return;
+        }
+      });
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values]);
 
   const resetModalForm = () => {
@@ -84,43 +98,45 @@ export default function EditUserModal({
   };
   const handleSubmit = (values) => {
     const { name, group, balance, status, note } = values;
-    const newUser = {
-      id: generateRandomId(),
+    const editedUser = {
+      id: userId,
       name: name,
       group: group,
       balance: balance,
       status: status === "radio-1" ? true : false,
       note: note,
     };
+    const notification = {
+      kind: "info",
+      title: `User ${name} was edited`,
+      id: generateRandomId(),
+    };
     setModalLoading(true);
+
     setTimeout(() => {
-      handleAddUser(newUser);
+      handleEditUser(editedUser);
       setModalLoading(false);
       resetModalForm();
       setModalOpen(false);
-      setNotification({
-        kind: "info",
-        title: `User ${name} was added`,
-        id: generateRandomId(),
-      });
+      setNotification(notification);
     }, 200);
   };
   const handleCancel = () => {
-    console.log("handleCancel");
     resetModalForm();
     setModalOpen(false);
   };
 
-  const modal = modalOpen && (
+  const renderModal = modalOpen && (
     <Modal
-      modalHeading={"Add user"}
-      primaryButtonText={"Apply and add"}
+      modalHeading={"Edit user"}
+      primaryButtonText={"Apply changes"}
       secondaryButtonText={"Cancel"}
       open={modalOpen}
       onRequestClose={handleCancel}
       onRequestSubmit={formik.handleSubmit}
       onSecondarySubmit={handleCancel}
-      primaryButtonDisabled={!allFieldsValid}
+      primaryButtonDisabled={!allFieldsValid || !formik.dirty}
+      preventCloseOnClickOutside={true}
     >
       <Loading active={modalLoading} />
       <Form>
@@ -269,7 +285,7 @@ export default function EditUserModal({
     </Modal>
   );
 
-  return modal;
+  return renderModal;
 }
 
 EditUserModal.defaultProps = {
@@ -280,5 +296,6 @@ EditUserModal.propTypes = {
   modalOpen: PropTypes.bool.isRequired,
   setModalOpen: PropTypes.func.isRequired,
   userGroups: PropTypes.array,
-  handleAddUser: PropTypes.func.isRequired,
+  handleEditUser: PropTypes.func.isRequired,
+  setNotification: PropTypes.func.isRequired,
 };
