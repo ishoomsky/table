@@ -20,25 +20,36 @@ const Container = styled.div`
 
 export default function Notification({ notification, setNotification }) {
   const [rootElement, setRootElement] = useState(null);
-  const { id, kind, title } = notification;
+
+  useEffect(() => {
+    if (notification) {
+      const intervalId = setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+      return () => {
+        clearTimeout(intervalId);
+      };
+    }
+  }, [notification]);
 
   useEffect(() => {
     setRootElement(document.getElementById("notifications-root"));
   }, []);
 
-  const notificationsModal = rootElement
-    ? ReactDOM.createPortal(
-        <Container>
-          <InlineNotification
-            key={id}
-            kind={kind}
-            title={title}
-            onClose={() => setNotification(null)}
-          />
-        </Container>,
-        rootElement
-      )
-    : null;
+  const notificationsModal =
+    rootElement && notification
+      ? ReactDOM.createPortal(
+          <Container>
+            <InlineNotification
+              key={notification?.id}
+              kind={notification?.kind}
+              title={notification?.title}
+              onClose={() => setNotification(null)}
+            />
+          </Container>,
+          rootElement
+        )
+      : null;
 
   return notificationsModal;
 }

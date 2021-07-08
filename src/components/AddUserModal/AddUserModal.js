@@ -46,7 +46,6 @@ export default function AddUserModal({
       status: "",
       note: "",
     },
-    // validateOnChange: validateState,
     validationSchema: validationSchema,
     onSubmit: (values) => {
       handleSubmit(values);
@@ -54,29 +53,33 @@ export default function AddUserModal({
   });
 
   useEffect(() => {
-    formik.validateForm().then((errors) => {
-      if (allFieldsValid) {
-        if (
-          !(
-            errors &&
-            Object.keys(errors).length === 0 &&
-            errors.constructor === Object
-          )
-        ) {
-          setAllFieldsValid(false);
+    if (modalOpen) {
+      formik.validateForm().then((errors) => {
+        if (allFieldsValid) {
+          if (
+            !(
+              errors &&
+              Object.keys(errors).length === 0 &&
+              errors.constructor === Object
+            )
+          ) {
+            setAllFieldsValid(false);
+          }
         }
-      }
 
-      //resolving to errors object, and if it empty, change validateState to true
-      if (
-        errors &&
-        Object.keys(errors).length === 0 &&
-        errors.constructor === Object
-      ) {
-        setAllFieldsValid(true);
-        return;
-      }
-    });
+        //resolving to errors object, and if it empty, change validateState to true
+        if (
+          errors &&
+          Object.keys(errors).length === 0 &&
+          errors.constructor === Object
+        ) {
+          setAllFieldsValid(true);
+          return;
+        }
+      });
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values]);
 
   const resetModalForm = () => {
@@ -99,19 +102,18 @@ export default function AddUserModal({
       resetModalForm();
       setModalOpen(false);
       setNotification({
-        kind: "info",
+        kind: "success",
         title: `User ${name} was added`,
         id: generateRandomId(),
       });
     }, 200);
   };
   const handleCancel = () => {
-    console.log("handleCancel");
     resetModalForm();
     setModalOpen(false);
   };
 
-  const modal = modalOpen && (
+  const renderModal = modalOpen && (
     <Modal
       modalHeading={"Add user"}
       primaryButtonText={"Apply and add"}
@@ -121,6 +123,7 @@ export default function AddUserModal({
       onRequestSubmit={formik.handleSubmit}
       onSecondarySubmit={handleCancel}
       primaryButtonDisabled={!allFieldsValid}
+      preventCloseOnClickOutside={true}
     >
       <Loading active={modalLoading} />
       <Form>
@@ -269,7 +272,7 @@ export default function AddUserModal({
     </Modal>
   );
 
-  return modal;
+  return renderModal;
 }
 
 AddUserModal.defaultProps = {
@@ -281,4 +284,5 @@ AddUserModal.propTypes = {
   setModalOpen: PropTypes.func.isRequired,
   userGroups: PropTypes.array,
   handleAddUser: PropTypes.func.isRequired,
+  setNotification: PropTypes.func.isRequired,
 };
