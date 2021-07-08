@@ -53,19 +53,20 @@ export default function AddUserModal({
   });
 
   useEffect(() => {
+    console.log("mount", modalOpen);
     if (modalOpen) {
       formik.validateForm().then((errors) => {
-        if (allFieldsValid) {
-          if (
-            !(
-              errors &&
-              Object.keys(errors).length === 0 &&
-              errors.constructor === Object
-            )
-          ) {
-            setAllFieldsValid(false);
-          }
-        }
+        // if (
+        //   !(
+        //     errors &&
+        //     Object.keys(errors).length === 0 &&
+        //     errors.constructor === Object
+        //   )
+        // ) {
+        //   console.log("setAllFieldsValid(false)");
+        //   setAllFieldsValid(false);
+        //   return;
+        // }
 
         //resolving to errors object, and if it empty, change validateState to true
         if (
@@ -73,12 +74,15 @@ export default function AddUserModal({
           Object.keys(errors).length === 0 &&
           errors.constructor === Object
         ) {
+          //   console.log("setAllFieldsValid(true)");
           setAllFieldsValid(true);
-          return;
+        } else {
+          //   console.log("setAllFieldsValid(false)");
+          setAllFieldsValid(false);
         }
       });
+      return () => console.log("unmount", modalOpen);
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values]);
 

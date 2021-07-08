@@ -64,31 +64,27 @@ export default function EditUserModal({
   });
 
   useEffect(() => {
-    if (modalOpen) {
-      formik.validateForm().then((errors) => {
-        if (allFieldsValid) {
-          if (
-            !(
-              errors &&
-              Object.keys(errors).length === 0 &&
-              errors.constructor === Object
-            )
-          ) {
-            setAllFieldsValid(false);
-          }
-        }
+    formik.validateForm().then((errors) => {
+      // if (allFieldsValid) {
+      //   if (
+      //     (errors &&
+      //       Object.keys(errors).length === 0 &&
+      //       errors.constructor === Object) === false
+      //   ) {
+      //     setAllFieldsValid(false);
+      //   }
+      // }
 
-        //resolving to errors object, and if it empty, change validateState to true
-        if (
-          errors &&
-          Object.keys(errors).length === 0 &&
-          errors.constructor === Object
-        ) {
-          setAllFieldsValid(true);
-          return;
-        }
-      });
-    }
+      //resolving to errors object, and if it empty, change validateState to true
+      if (
+        errors &&
+        Object.keys(errors).length === 0 &&
+        errors.constructor === Object
+      ) {
+        setAllFieldsValid(true);
+        return;
+      }
+    });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values]);
