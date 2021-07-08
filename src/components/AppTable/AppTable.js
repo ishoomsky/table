@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react";
 import { setLS, getLS } from "../../functions/localStorageFunctions";
 import {
   Grid,
-  Row,
-  Column,
   DataTable,
   TableContainer,
   Table,
@@ -19,12 +17,19 @@ import {
 import { Edit16, Delete16 } from "@carbon/icons-react";
 
 import AddUserModal from "../AddUserModal";
+import EditUserModal from "../EditUserModal";
+import DeleteUserModal from "../DeleteUserModal";
 import Notification from "../Notification";
 
 export default function AppTable() {
   const [users, setUsers] = useState([]);
+
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+  const [currentUser, setCurrentUser] = useState(null);
+
   const [userGroups, setUserGroups] = useState([]);
 
   const [notification, setNotification] = useState(null);
@@ -70,40 +75,86 @@ export default function AppTable() {
     setUsers(newUsers);
     setLS(newUsers);
   };
-  const handleEditUser = () => {};
-  const handleDeleteUser = () => {};
-  const handleChangeStatus = (id) => {
+
+  const handleEditUser = (currentUser) => {
     const newUsers = [...users];
+    const indexUpdatedUser = newUsers.findIndex(
+      (user) => user.id === currentUser.id
+    );
 
-    const updatingIndex = newUsers.findIndex((row) => row.id === id);
-    const updatingRow = newUsers[updatingIndex];
-
-    const newStatus = !updatingRow.status;
-
-    newUsers.splice(updatingIndex, 1, {
-      ...updatingRow,
-      status: newStatus,
-    });
-
+    newUsers.splice(indexUpdatedUser, 1, currentUser);
     setUsers(newUsers);
     setLS(newUsers);
   };
-  const handleChangeGroup = () => {};
 
-  const handleSetNotification = (value) => {
-    if (value) {
-      setNotification(value);
-      setTimeout(() => {
-        setNotification(null);
-      }, 3000);
-      return;
-    }
-    setNotification(null);
+  const handleDeleteUser = (currentUserId) => {
+    const newUsers = [...users];
+    const indexDeletedUser = newUsers.findIndex(
+      (user) => user.id === currentUserId
+    );
+    newUsers.splice(indexDeletedUser, 1);
+    setUsers(newUsers);
+    setLS(newUsers);
   };
+
+  const tableHeaders = (headers) =>
+    headers?.map(({ header }) => (
+      <TableHeader key={header}>{header}</TableHeader>
+    ));
+
+  const tableCells = (row) => (
+    <>
+      <TableCell>{row.name}</TableCell>
+      <TableCell>{row.group}</TableCell>
+
+      <TableCell>{row.balance} BYN</TableCell>
+
+      <TableCell
+        style={{
+          color: row.status ? "green" : "maroon",
+        }}
+      >
+        {row.status ? "Active" : "Not active"}
+      </TableCell>
+
+      <TableCell>{row.note}</TableCell>
+
+      <TableCell
+        style={{
+          display: "flex",
+          gap: "5px",
+        }}
+      >
+        <Button
+          renderIcon={Edit16}
+          iconDescription="Edit"
+          hasIconOnly
+          onClick={() => {
+            const currentUser = users.filter(({ id }) => id === row.id)[0];
+            setCurrentUser(currentUser);
+            setEditModalOpen(true);
+          }}
+        />
+        <Button
+          renderIcon={Delete16}
+          iconDescription="Delete"
+          hasIconOnly
+          onClick={() => {
+            const currentUser = users.filter(({ id }) => id === row.id)[0];
+            setCurrentUser(currentUser);
+            setDeleteModalOpen(true);
+          }}
+        />
+      </TableCell>
+    </>
+  );
+
+  const tableRows = (rows) =>
+    rows?.map((row) => <TableRow key={row.id}>{tableCells(row)}</TableRow>);
 
   const dataTable = (
     <DataTable rows={users} headers={headers}>
-      {({ rows, getRowProps }) => (
+      {() => (
         <TableContainer>
           <TableToolbar>
             <TableToolbarContent>
@@ -112,87 +163,65 @@ export default function AppTable() {
           </TableToolbar>
           <Table>
             <TableHead>
-              <TableRow>
-                {headers.map(({ header }) => (
-                  <TableHeader key={header}>{header}</TableHeader>
-                ))}
-              </TableRow>
+              <TableRow>{tableHeaders(headers)}</TableRow>
             </TableHead>
-            <TableBody>
-              {rows.map((row) => (
-                <TableRow {...getRowProps({ row })}>
-                  {row.cells.map((cell) => {
-                    switch (cell.info.header) {
-                      case "status":
-                        return (
-                          <TableCell
-                            style={{
-                              color: cell.value ? "green" : "maroon",
-                            }}
-                            key={cell.id}
-                          >
-                            {cell.value ? "Active" : "Not active"}
-                          </TableCell>
-                        );
-                      case "balance":
-                        return (
-                          <TableCell key={cell.id}>{cell.value} BYN</TableCell>
-                        );
-                      case "controls":
-                        return (
-                          <TableCell
-                            style={{
-                              display: "flex",
-                              gap: "5px",
-                            }}
-                            key={cell.id}
-                          >
-                            <Button
-                              renderIcon={Edit16}
-                              iconDescription="Edit"
-                              hasIconOnly
-                              onClick={() =>
-                                console.log("edit click " + row.id)
-                              }
-                            />
-                            <Button
-                              renderIcon={Delete16}
-                              iconDescription="Delete"
-                              hasIconOnly
-                              onClick={() => console.log("del click " + row.id)}
-                            />
-                          </TableCell>
-                        );
-                      default:
-                        return (
-                          <TableCell key={cell.id}>{cell.value}</TableCell>
-                        );
-                    }
-                  })}
-                </TableRow>
-              ))}
-            </TableBody>
+            <TableBody>{tableRows(users)}</TableBody>
           </Table>
         </TableContainer>
       )}
     </DataTable>
   );
 
+  const renderNotification = notification && (
+    <Notification
+      notification={notification}
+      setNotification={setNotification}
+    />
+  );
+
+  const renderAddUserModal = addModalOpen && (
+    <AddUserModal
+      modalOpen={addModalOpen}
+      setModalOpen={setAddModalOpen}
+      handleAddUser={handleAddUser}
+      userGroups={userGroups}
+      setNotification={setNotification}
+    />
+  );
+
+  const renderEditModalOpen = editModalOpen && (
+    <EditUserModal
+      currentUser={currentUser}
+      modalOpen={editModalOpen}
+      setModalOpen={setEditModalOpen}
+      handleEditUser={handleEditUser}
+      userGroups={userGroups}
+      setNotification={setNotification}
+    />
+  );
+
+  const renderDeleteModalOpen = deleteModalOpen && (
+    <DeleteUserModal
+      modalOpen={deleteModalOpen}
+      setModalOpen={setDeleteModalOpen}
+      setNotification={setNotification}
+      currentUser={currentUser}
+      handleDeleteUser={handleDeleteUser}
+    />
+  );
+
+  const renderModals = () => (
+    <>
+      {renderNotification}
+      {renderAddUserModal}
+      {renderEditModalOpen}
+      {renderDeleteModalOpen}
+    </>
+  );
+
   return (
     <Grid>
-      {notification && (
-        <Notification
-          notification={notification}
-          setNotification={handleSetNotification}
-        />
-      )}
-      <AddUserModal
-        modalOpen={addModalOpen}
-        setModalOpen={setAddModalOpen}
-        handleAddUser={handleAddUser}
-        userGroups={userGroups}
-        setNotification={handleSetNotification}
-      />
+      {renderModals()}
       {dataTable}
     </Grid>
   );
