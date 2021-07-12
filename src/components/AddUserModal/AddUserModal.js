@@ -37,7 +37,7 @@ export default function AddUserModal({
   setNotification,
 }) {
   const [modalLoading, setModalLoading] = useState(false);
-  const [allFieldsValid, setAllFieldsValid] = useState(false);
+  const [allFieldsValid, setAllFieldsValid] = useState(true);
   const formik = useFormik({
     initialValues: {
       name: "",
@@ -53,36 +53,34 @@ export default function AddUserModal({
   });
 
   useEffect(() => {
-    console.log("mount", modalOpen);
+    let cleanupFunction = false;
     if (modalOpen) {
       formik.validateForm().then((errors) => {
-        // if (
-        //   !(
-        //     errors &&
-        //     Object.keys(errors).length === 0 &&
-        //     errors.constructor === Object
-        //   )
-        // ) {
-        //   console.log("setAllFieldsValid(false)");
-        //   setAllFieldsValid(false);
-        //   return;
-        // }
-
+        if (
+          !(
+            errors &&
+            Object.keys(errors).length === 0 &&
+            errors.constructor === Object
+          )
+        ) {
+          if (!cleanupFunction) setAllFieldsValid(false);
+          return;
+        }
         //resolving to errors object, and if it empty, change validateState to true
         if (
           errors &&
           Object.keys(errors).length === 0 &&
           errors.constructor === Object
         ) {
-          //   console.log("setAllFieldsValid(true)");
-          setAllFieldsValid(true);
+          if (!cleanupFunction) setAllFieldsValid(true);
         } else {
-          //   console.log("setAllFieldsValid(false)");
-          setAllFieldsValid(false);
+          if (!cleanupFunction) setAllFieldsValid(false);
         }
       });
-      return () => console.log("unmount", modalOpen);
     }
+    return () => {
+      cleanupFunction = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values]);
 

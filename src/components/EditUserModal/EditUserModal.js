@@ -64,16 +64,17 @@ export default function EditUserModal({
   });
 
   useEffect(() => {
+    let cleanupFunction = false;
     formik.validateForm().then((errors) => {
-      // if (allFieldsValid) {
-      //   if (
-      //     (errors &&
-      //       Object.keys(errors).length === 0 &&
-      //       errors.constructor === Object) === false
-      //   ) {
-      //     setAllFieldsValid(false);
-      //   }
-      // }
+      if (allFieldsValid) {
+        if (
+          (errors &&
+            Object.keys(errors).length === 0 &&
+            errors.constructor === Object) === false
+        ) {
+          if (!cleanupFunction) setAllFieldsValid(false);
+        }
+      }
 
       //resolving to errors object, and if it empty, change validateState to true
       if (
@@ -81,11 +82,13 @@ export default function EditUserModal({
         Object.keys(errors).length === 0 &&
         errors.constructor === Object
       ) {
-        setAllFieldsValid(true);
+        if (!cleanupFunction) setAllFieldsValid(true);
         return;
       }
     });
-
+    return () => {
+      cleanupFunction = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formik.values]);
 
