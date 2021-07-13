@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { setLS, getLS } from "../../functions/localStorageFunctions";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Grid,
   DataTable,
@@ -13,16 +13,26 @@ import {
   TableToolbar,
   TableToolbarContent,
   Button,
+  Loading,
 } from "carbon-components-react";
 import { Edit16, Delete16 } from "@carbon/icons-react";
 
+// import { setLS, getLS } from "../../functions/localStorageFunctions";
+import { usersSet } from "../../store/reducers/usersReducer";
 import AddUserModal from "../AddUserModal";
 import EditUserModal from "../EditUserModal";
 import DeleteUserModal from "../DeleteUserModal";
 import Notification from "../Notification";
 
 export default function AppTable() {
-  const [users, setUsers] = useState([]);
+  const dispatch = useDispatch();
+  const { users, status: usersFetchStatus } = useSelector(
+    (state) => state.users
+  );
+
+  const { userGroups, status: userGroupsFetchStatus } = useSelector(
+    (state) => state.userGroups
+  );
 
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -30,18 +40,7 @@ export default function AppTable() {
 
   const [currentUser, setCurrentUser] = useState(null);
 
-  const [userGroups, setUserGroups] = useState([]);
-
   const [notification, setNotification] = useState(null);
-
-  useEffect(() => {
-    const data = getLS() || [];
-    setUsers(data);
-
-    const groups = new Set([]);
-    data?.forEach(({ group }) => groups.add(group));
-    setUserGroups([...groups]);
-  }, []);
 
   const headers = [
     {
@@ -70,10 +69,15 @@ export default function AppTable() {
     },
   ];
 
+  const isDataLoaded =
+    usersFetchStatus === "LOADED" && userGroupsFetchStatus === "LOADED";
+
+  const isDataError =
+    usersFetchStatus === "ERROR" || userGroupsFetchStatus === "ERROR";
+
   const handleAddUser = (newUser) => {
     const newUsers = [...users, newUser];
-    setUsers(newUsers);
-    setLS(newUsers);
+    dispatch(usersSet(newUsers));
   };
 
   const handleEditUser = (currentUser) => {
@@ -83,8 +87,7 @@ export default function AppTable() {
     );
 
     newUsers.splice(indexUpdatedUser, 1, currentUser);
-    setUsers(newUsers);
-    setLS(newUsers);
+    dispatch(usersSet(newUsers));
   };
 
   const handleDeleteUser = (currentUserId) => {
@@ -93,9 +96,22 @@ export default function AppTable() {
       (user) => user.id === currentUserId
     );
     newUsers.splice(indexDeletedUser, 1);
-    setUsers(newUsers);
-    setLS(newUsers);
+    dispatch(usersSet(newUsers));
   };
+
+  const errorMessage = isDataError && (
+    <div
+      style={{
+        display: "flex",
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        height: "50vh",
+      }}
+    >
+      <h1 style={{ color: "red" }}>Sorry, the service is unavailable</h1>
+    </div>
+  );
 
   const tableHeaders = (headers) =>
     headers?.map(({ header }) => (
@@ -221,8 +237,10 @@ export default function AppTable() {
 
   return (
     <Grid>
-      {renderModals()}
-      {dataTable}
+      <Loading active={isDataError === false && !isDataLoaded} />
+      {errorMessage}
+      {isDataError === false && renderModals()}
+      {isDataError === false && dataTable}
     </Grid>
   );
 }
