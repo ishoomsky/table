@@ -23,7 +23,8 @@ import EditUserModal from "../EditUserModal";
 import DeleteUserModal from "../DeleteUserModal";
 import Notification from "../Notification";
 
-export default function AppTable() {
+const AppTable = () => {
+  console.log("AppTable render");
   const dispatch = useDispatch();
   const { users, status: usersFetchStatus } = useSelector(
     (state) => state.users
@@ -32,6 +33,14 @@ export default function AppTable() {
   const { userGroups, status: userGroupsFetchStatus } = useSelector(
     (state) => state.userGroups
   );
+
+  useEffect(() => {
+    console.log("users changed");
+  }, [users]);
+
+  useEffect(() => {
+    console.log("userGroups changed");
+  }, [userGroups]);
 
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -167,24 +176,31 @@ export default function AppTable() {
   const tableRows = (rows) =>
     rows?.map((row) => <TableRow key={row.id}>{tableCells(row)}</TableRow>);
 
-  const dataTable = (
-    <DataTable rows={users} headers={headers}>
-      {() => (
-        <TableContainer>
-          <TableToolbar>
-            <TableToolbarContent>
-              <Button onClick={() => setAddModalOpen(true)}>Add user</Button>
-            </TableToolbarContent>
-          </TableToolbar>
-          <Table>
-            <TableHead>
-              <TableRow>{tableHeaders(headers)}</TableRow>
-            </TableHead>
-            <TableBody>{tableRows(users)}</TableBody>
-          </Table>
-        </TableContainer>
-      )}
-    </DataTable>
+  const renderDataTable = (users, headers) => {
+    console.log("RENDER TABLE");
+    return (
+      <DataTable rows={users} headers={headers}>
+        {() => (
+          <TableContainer>
+            <TableToolbar>
+              <TableToolbarContent>
+                <Button onClick={() => setAddModalOpen(true)}>Add user</Button>
+              </TableToolbarContent>
+            </TableToolbar>
+            <Table>
+              <TableHead>
+                <TableRow>{tableHeaders(headers)}</TableRow>
+              </TableHead>
+              <TableBody>{tableRows(users)}</TableBody>
+            </Table>
+          </TableContainer>
+        )}
+      </DataTable>
+    );
+  };
+  const memoized = React.useMemo(
+    () => renderDataTable(users, headers),
+    [users]
   );
 
   const renderNotification = notification && (
@@ -225,14 +241,17 @@ export default function AppTable() {
     />
   );
 
-  const renderModals = () => (
-    <>
-      {renderNotification}
-      {renderAddUserModal}
-      {renderEditModalOpen}
-      {renderDeleteModalOpen}
-    </>
-  );
+  const renderModals = () => {
+    console.log("render modals");
+    return (
+      <>
+        {renderNotification}
+        {renderAddUserModal}
+        {renderEditModalOpen}
+        {renderDeleteModalOpen}
+      </>
+    );
+  };
 
   if (isDataLoadError) return <Grid>{errorMessage}</Grid>;
 
@@ -240,7 +259,10 @@ export default function AppTable() {
     <Grid>
       <Loading active={!isDataLoaded} />
       {renderModals()}
-      {dataTable}
+      {memoized}
+      {/* {renderDataTable(users, headers)} */}
     </Grid>
   );
-}
+};
+
+export default AppTable;
