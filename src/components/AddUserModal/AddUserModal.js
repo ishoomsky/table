@@ -29,13 +29,13 @@ const validationSchema = Yup.object().shape({
   note: Yup.string().label("note"),
 });
 
-export default function AddUserModal({
+const AddUserModal = ({
   modalOpen,
   setModalOpen,
   handleAddUser,
   userGroups,
   setNotification,
-}) {
+}) => {
   const [modalLoading, setModalLoading] = useState(false);
   const [allFieldsValid, setAllFieldsValid] = useState(true);
   const formik = useFormik({
@@ -156,7 +156,7 @@ export default function AddUserModal({
             autoComplete={"off"}
           >
             <SelectItem disabled hidden value="" text="" />
-            {userGroups?.map((group) => (
+            {userGroups.map((group) => (
               <SelectItem key={group} value={group} text={group} />
             ))}
           </Select>
@@ -275,7 +275,7 @@ export default function AddUserModal({
   );
 
   return renderModal;
-}
+};
 
 AddUserModal.defaultProps = {
   userGroups: [],
@@ -288,3 +288,5 @@ AddUserModal.propTypes = {
   handleAddUser: PropTypes.func.isRequired,
   setNotification: PropTypes.func.isRequired,
 };
+
+export default AddUserModal;

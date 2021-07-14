@@ -4,13 +4,13 @@ import { Modal, Loading } from "carbon-components-react";
 
 import { generateRandomId } from "../../functions/generateRandomId";
 
-export default function DeleteModal({
+const DeleteModal = ({
   modalOpen,
   setModalOpen,
   handleDeleteUser,
   setNotification,
   currentUser,
-}) {
+}) => {
   const [modalLoading, setModalLoading] = useState(false);
   const notification = {
     kind: "warning",
@@ -44,7 +44,9 @@ export default function DeleteModal({
   );
 
   return renderModal;
-}
+};
+
+export default DeleteModal;
 
 DeleteModal.propTypes = {
   modalOpen: PropTypes.bool.isRequired,

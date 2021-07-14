@@ -18,7 +18,7 @@ const Container = styled.div`
   left: ${containerPosX}px;
 `;
 
-export default function Notification({ notification, setNotification }) {
+const Notification = ({ notification, setNotification }) => {
   const [rootElement, setRootElement] = useState(null);
 
   useEffect(() => {
@@ -52,7 +52,9 @@ export default function Notification({ notification, setNotification }) {
       : null;
 
   return notificationsModal;
-}
+};
+
+export default Notification;
 
 Notification.defaultProps = {
   kind: "",

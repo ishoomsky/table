@@ -29,14 +29,14 @@ const validationSchema = Yup.object().shape({
   note: Yup.string().label("note"),
 });
 
-export default function EditUserModal({
+const EditUserModal = ({
   modalOpen,
   setModalOpen,
   handleEditUser,
   userGroups,
   setNotification,
   currentUser,
-}) {
+}) => {
   const [modalLoading, setModalLoading] = useState(false);
   const [allFieldsValid, setAllFieldsValid] = useState(false);
 
@@ -166,7 +166,7 @@ export default function EditUserModal({
             autoComplete={"off"}
           >
             <SelectItem disabled hidden value="" text="" />
-            {userGroups?.map((group) => (
+            {userGroups.map((group) => (
               <SelectItem key={group} value={group} text={group} />
             ))}
           </Select>
@@ -285,7 +285,9 @@ export default function EditUserModal({
   );
 
   return renderModal;
-}
+};
+
+export default EditUserModal;
 
 EditUserModal.defaultProps = {
   userGroups: [],
