@@ -46,14 +46,10 @@ export default function DeleteModal({
   return renderModal;
 }
 
-DeleteModal.defaultProps = {
-  currentUser: {},
-};
-
 DeleteModal.propTypes = {
   modalOpen: PropTypes.bool.isRequired,
   setModalOpen: PropTypes.func.isRequired,
-  currentUser: PropTypes.object,
+  currentUser: PropTypes.object.isRequired,
   handleDeleteUser: PropTypes.func.isRequired,
   setNotification: PropTypes.func.isRequired,
 };
