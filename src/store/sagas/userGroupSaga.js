@@ -29,7 +29,6 @@ function* userGroupsInitWorker() {
       yield call(setLS, [...groups], localStorageKey);
       yield put(userGroupsSet([...groups]));
     } catch (err) {
-      console.log(err);
       yield put(userGroupsError()); //if error loading, throw error
     }
   }
