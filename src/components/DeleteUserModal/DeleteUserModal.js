@@ -17,6 +17,7 @@ export default function DeleteModal({
     title: `User ${currentUser?.name} was deleted`,
     id: generateRandomId(),
   };
+
   const handleSubmit = (id) => {
     setModalLoading(true);
     setTimeout(() => {
@@ -44,6 +45,10 @@ export default function DeleteModal({
 
   return renderModal;
 }
+
+DeleteModal.defaultProps = {
+  currentUser: {},
+};
 
 DeleteModal.propTypes = {
   modalOpen: PropTypes.bool.isRequired,
