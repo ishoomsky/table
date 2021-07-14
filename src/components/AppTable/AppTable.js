@@ -17,8 +17,7 @@ import {
 } from "carbon-components-react";
 import { Edit16, Delete16 } from "@carbon/icons-react";
 
-// import { setLS, getLS } from "../../functions/localStorageFunctions";
-import { usersSet } from "../../store/reducers/usersReducer";
+import { usersAsyncSet } from "../../store/reducers/usersReducer";
 import AddUserModal from "../AddUserModal";
 import EditUserModal from "../EditUserModal";
 import DeleteUserModal from "../DeleteUserModal";
@@ -72,12 +71,12 @@ export default function AppTable() {
   const isDataLoaded =
     usersFetchStatus === "LOADED" && userGroupsFetchStatus === "LOADED";
 
-  const isDataError =
+  const isDataLoadError =
     usersFetchStatus === "ERROR" || userGroupsFetchStatus === "ERROR";
 
   const handleAddUser = (newUser) => {
     const newUsers = [...users, newUser];
-    dispatch(usersSet(newUsers));
+    dispatch(usersAsyncSet(newUsers));
   };
 
   const handleEditUser = (currentUser) => {
@@ -87,7 +86,7 @@ export default function AppTable() {
     );
 
     newUsers.splice(indexUpdatedUser, 1, currentUser);
-    dispatch(usersSet(newUsers));
+    dispatch(usersAsyncSet(newUsers));
   };
 
   const handleDeleteUser = (currentUserId) => {
@@ -96,10 +95,10 @@ export default function AppTable() {
       (user) => user.id === currentUserId
     );
     newUsers.splice(indexDeletedUser, 1);
-    dispatch(usersSet(newUsers));
+    dispatch(usersAsyncSet(newUsers));
   };
 
-  const errorMessage = isDataError && (
+  const errorMessage = isDataLoadError && (
     <div
       style={{
         display: "flex",
@@ -235,12 +234,13 @@ export default function AppTable() {
     </>
   );
 
+  if (isDataLoadError) return <Grid>{errorMessage}</Grid>;
+
   return (
     <Grid>
-      <Loading active={isDataError === false && !isDataLoaded} />
-      {errorMessage}
-      {isDataError === false && renderModals()}
-      {isDataError === false && dataTable}
+      <Loading active={!isDataLoaded} />
+      {renderModals()}
+      {dataTable}
     </Grid>
   );
 }
