@@ -32,14 +32,13 @@ function* usersInitWorker() {
       yield call(setLS, json, localStorageKey);
       yield put(usersSet(json));
     } catch (err) {
-      console.log(err);
       yield put(usersError()); //if error loading, throw error
     }
   }
 }
 
 function* usersSetWorker(action) {
-  yield call(setLS, action.payload);
+  yield call(setLS, action.payload, localStorageKey);
   yield put(usersSet(action.payload));
 }
 
