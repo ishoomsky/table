@@ -15,6 +15,8 @@ import {
   Button,
   Loading,
 } from "carbon-components-react";
+
+import styled from "styled-components";
 import { Edit16, Delete16 } from "@carbon/icons-react";
 
 import { usersAsyncSet } from "../../store/actions/usersActions";
@@ -25,17 +27,9 @@ import Notification from "../Notification";
 
 const AppTable = () => {
   const dispatch = useDispatch();
-  const {
-    users,
-    loaded: usersLoaded,
-    error: usersError,
-  } = useSelector((state) => state.users);
+  const { users, loaded: usersLoaded, error: usersError } = useSelector((state) => state.users);
 
-  const {
-    userGroups,
-    loaded: userGroupsLoaded,
-    error: userGroupsError,
-  } = useSelector((state) => state.userGroups);
+  const { userGroups, loaded: userGroupsLoaded, error: userGroupsError } = useSelector((state) => state.userGroups);
 
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -82,9 +76,7 @@ const AppTable = () => {
 
   const handleEditUser = (currentUser) => {
     const newUsers = [...users];
-    const indexUpdatedUser = newUsers.findIndex(
-      (user) => user.id === currentUser.id
-    );
+    const indexUpdatedUser = newUsers.findIndex((user) => user.id === currentUser.id);
 
     newUsers.splice(indexUpdatedUser, 1, currentUser);
     dispatch(usersAsyncSet(newUsers));
@@ -92,9 +84,7 @@ const AppTable = () => {
 
   const handleDeleteUser = (currentUserId) => {
     const newUsers = [...users];
-    const indexDeletedUser = newUsers.findIndex(
-      (user) => user.id === currentUserId
-    );
+    const indexDeletedUser = newUsers.findIndex((user) => user.id === currentUserId);
     newUsers.splice(indexDeletedUser, 1);
     dispatch(usersAsyncSet(newUsers));
   };
@@ -113,10 +103,7 @@ const AppTable = () => {
     </div>
   );
 
-  const tableHeaders = (headers) =>
-    headers?.map(({ header }) => (
-      <TableHeader key={header}>{header}</TableHeader>
-    ));
+  const tableHeaders = (headers) => headers?.map(({ header }) => <TableHeader key={header}>{header}</TableHeader>);
 
   const tableCells = (row) => (
     <>
@@ -165,11 +152,9 @@ const AppTable = () => {
     </>
   );
 
-  const tableRows = (rows) =>
-    rows?.map((row) => <TableRow key={row.id}>{tableCells(row)}</TableRow>);
+  const tableRows = (rows) => rows?.map((row) => <TableRow key={row.id}>{tableCells(row)}</TableRow>);
 
   const renderDataTable = (users, headers) => {
-    console.log("RENDER TABLE");
     return (
       <DataTable rows={users} headers={headers}>
         {() => (
@@ -190,17 +175,13 @@ const AppTable = () => {
       </DataTable>
     );
   };
-  const memoized = React.useMemo(
-    () => renderDataTable(users, headers),
-    [users]
-  );
+  // const memoized = React.useMemo(
+  //   () => renderDataTable(users, headers),
+  //   [users]
+  // );
 
-  const renderNotification = notification && (
-    <Notification
-      notification={notification}
-      setNotification={setNotification}
-    />
-  );
+  // const renderNotification =
+  // );
 
   const renderAddUserModal = addModalOpen && (
     <AddUserModal
@@ -234,10 +215,8 @@ const AppTable = () => {
   );
 
   const renderModals = () => {
-    console.log("render modals");
     return (
       <>
-        {renderNotification}
         {renderAddUserModal}
         {renderEditModalOpen}
         {renderDeleteModalOpen}
@@ -248,13 +227,27 @@ const AppTable = () => {
   if (isDataLoadError) return <Grid>{errorMessage}</Grid>;
 
   return (
-    <Grid>
-      <Loading active={!isDataLoaded} />
-      {renderModals()}
-      {memoized}
-      {/* {renderDataTable(users, headers)} */}
-    </Grid>
+    <>
+      <Grid>
+        <Loading active={!isDataLoaded} />
+        {renderModals()}
+        {renderDataTable(users, headers)}
+      </Grid>
+      {notification && (
+        <NotificationContainer>
+          <Notification notification={notification} setNotification={setNotification} />
+        </NotificationContainer>
+      )}
+    </>
   );
 };
+
+const NotificationContainer = styled.div`
+  background-color: red;
+  // height: 20px;
+  position: fixed;
+  width: 100%;
+  top: 0;
+`;
 
 export default AppTable;

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import ReactDOM from "react-dom";
+import React, { useEffect } from "react";
+// import ReactDOM from "react-dom";
 import { PropTypes } from "prop-types";
 import { InlineNotification } from "carbon-components-react";
 import styled from "styled-components";
@@ -14,13 +14,10 @@ const containerPosX = windowWidth / 2 - containerWidth / 2;
 const Container = styled.div`
   position: fixed;
   width: ${containerWidth}px;
-  top: 0;
   left: ${containerPosX}px;
 `;
 
 const Notification = ({ notification, setNotification }) => {
-  const [rootElement, setRootElement] = useState(null);
-
   useEffect(() => {
     if (notification) {
       const intervalId = setTimeout(() => {
@@ -32,39 +29,21 @@ const Notification = ({ notification, setNotification }) => {
     }
   }, [notification]);
 
-  useEffect(() => {
-    setRootElement(document.getElementById("notifications-root"));
-  }, []);
-
-  const notificationsModal =
-    rootElement && notification
-      ? ReactDOM.createPortal(
-          <Container>
-            <InlineNotification
-              key={notification?.id}
-              kind={notification?.kind}
-              title={notification?.title}
-              onClose={() => setNotification(null)}
-            />
-          </Container>,
-          rootElement
-        )
-      : null;
-
-  return notificationsModal;
+  return (
+    <Container>
+      <InlineNotification
+        key={notification?.id}
+        kind={notification?.kind}
+        title={notification?.title}
+        onClose={() => setNotification(null)}
+      />
+    </Container>
+  );
 };
 
 export default Notification;
 
-Notification.defaultProps = {
-  kind: "",
-  title: "",
-  id: "",
-};
-
 Notification.propTypes = {
-  kind: PropTypes.string,
-  title: PropTypes.string,
-  id: PropTypes.string,
+  notification: PropTypes.object.isRequired,
   setNotification: PropTypes.func.isRequired,
 };
