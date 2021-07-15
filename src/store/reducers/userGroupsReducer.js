@@ -1,47 +1,63 @@
+import {
+  USERGROUPS_LOAD_START,
+  USERGROUPS_LOAD_ERROR,
+  USERGROUPS_LOAD_FINISH,
+  USERGROUPS_SET,
+} from "../actions/actionTypes";
+
 const initState = {
-  status: null,
+  loaded: null,
+  error: null,
   userGroups: [],
 };
 
-export const USERGROUPS_LOADING = "USERGROUPS_LOADING";
-export const USERGROUPS_ERROR = "USERGROUPS_ERROR";
-export const USERGROUPS_SET = "USERGROUPS_SET";
+const userGroupsLoadStart = (state) => {
+  const updater = {
+    loaded: false,
+    error: false,
+  };
+  return { ...state, ...updater };
+};
 
-export const USERGROUPS_FETCH = "USERGROUPS_FETCH";
+const userGroupsLoadError = (state) => {
+  const updater = {
+    loaded: false,
+    error: true,
+  };
+  return { ...state, ...updater };
+};
+
+const userGroupsLoadFinish = (state) => {
+  const updater = {
+    loaded: true,
+    error: false,
+  };
+  return { ...state, ...updater };
+};
+
+const userGroupsSet = (state, action) => {
+  const updater = {
+    userGroups: action.payload,
+  };
+  return { ...state, ...updater };
+};
 
 export const userGroupsReducer = (state = initState, action) => {
   switch (action.type) {
-    case USERGROUPS_LOADING: {
-      let newState = {
-        status: "START",
-        userGroups: [],
-      };
-      return newState;
+    case USERGROUPS_LOAD_START: {
+      return userGroupsLoadStart(state);
     }
-
-    case USERGROUPS_ERROR: {
-      let newState = {
-        status: "ERROR",
-        userGroups: [],
-      };
-      return newState;
+    case USERGROUPS_LOAD_ERROR: {
+      return userGroupsLoadError(state);
     }
-
+    case USERGROUPS_LOAD_FINISH: {
+      return userGroupsLoadFinish(state);
+    }
     case USERGROUPS_SET: {
-      const newState = {
-        status: "LOADED",
-        userGroups: action.payload,
-      };
-      return newState;
+      return userGroupsSet(state, action);
     }
 
     default:
       return state;
   }
 };
-
-export const userGroupsLoading = () => ({ type: USERGROUPS_LOADING });
-export const userGroupsError = () => ({ type: USERGROUPS_ERROR });
-export const userGroupsSet = (payload) => ({ type: USERGROUPS_SET, payload });
-
-export const userGroupsFetch = () => ({ type: USERGROUPS_FETCH });

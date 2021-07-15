@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
   Grid,
@@ -17,30 +17,25 @@ import {
 } from "carbon-components-react";
 import { Edit16, Delete16 } from "@carbon/icons-react";
 
-import { usersAsyncSet } from "../../store/reducers/usersReducer";
+import { usersAsyncSet } from "../../store/actions/usersActions";
 import AddUserModal from "../AddUserModal";
 import EditUserModal from "../EditUserModal";
 import DeleteUserModal from "../DeleteUserModal";
 import Notification from "../Notification";
 
 const AppTable = () => {
-  console.log("AppTable render");
   const dispatch = useDispatch();
-  const { users, status: usersFetchStatus } = useSelector(
-    (state) => state.users
-  );
+  const {
+    users,
+    loaded: usersLoaded,
+    error: usersError,
+  } = useSelector((state) => state.users);
 
-  const { userGroups, status: userGroupsFetchStatus } = useSelector(
-    (state) => state.userGroups
-  );
-
-  useEffect(() => {
-    console.log("users changed");
-  }, [users]);
-
-  useEffect(() => {
-    console.log("userGroups changed");
-  }, [userGroups]);
+  const {
+    userGroups,
+    loaded: userGroupsLoaded,
+    error: userGroupsError,
+  } = useSelector((state) => state.userGroups);
 
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -77,11 +72,8 @@ const AppTable = () => {
     },
   ];
 
-  const isDataLoaded =
-    usersFetchStatus === "LOADED" && userGroupsFetchStatus === "LOADED";
-
-  const isDataLoadError =
-    usersFetchStatus === "ERROR" || userGroupsFetchStatus === "ERROR";
+  const isDataLoaded = usersLoaded && userGroupsLoaded;
+  const isDataLoadError = usersError || userGroupsError;
 
   const handleAddUser = (newUser) => {
     const newUsers = [...users, newUser];

@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 
-import { usersFetch } from "./store/reducers/usersReducer";
-import { userGroupsFetch } from "./store/reducers/userGroupsReducer";
+import { usersAsyncFetch } from "./store/actions/usersActions";
+import { userGroupsAsyncFetch } from "./store/actions/userGroupsActions";
 
 import AppTable from "./components/AppTable";
 
@@ -10,8 +10,8 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(usersFetch());
-    dispatch(userGroupsFetch());
+    dispatch(usersAsyncFetch());
+    dispatch(userGroupsAsyncFetch());
   }, []);
 
   return <AppTable />;

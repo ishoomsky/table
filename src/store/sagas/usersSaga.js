@@ -1,51 +1,49 @@
-import { put, takeEvery, call } from "redux-saga/effects";
+import { put, call, takeLatest, all } from "redux-saga/effects";
+import { USERS_ASYNC_FETCH, USERS_ASYNC_SET } from "../actions/actionTypes";
 import {
-  USERS_FETCH,
-  USERS_ASYNC_SET,
   usersSet,
-  usersLoading,
-  usersError,
-} from "../reducers/usersReducer";
-import { setLS, getLS } from "../../functions/localStorageFunctions";
+  usersLoadStart,
+  usersLoadError,
+  usersLoadFinish,
+} from "../actions/usersActions";
+import * as storageAPI from "../../functions/localStorageAPI";
 
 const usersApi = "https://api.jsonbin.io/b/60ec02d6a63d2870c1927632";
 const localStorageKey = "app-data-users";
 
 const fetchUsersFromApi = () => fetch(usersApi);
+const isLsEmpty = storageAPI.isLocalStorageEmpty(localStorageKey);
 
-function* usersInitWorker() {
-  if (
-    localStorage.getItem(localStorageKey) !== null &&
-    localStorage.getItem(localStorageKey) !== undefined
-  ) {
+function* usersFetchWorker() {
+  if (isLsEmpty) {
     //if local storage is not empty, get data from LS, dispatch action
-
-    const data = yield call(getLS, localStorageKey);
-    yield put(usersSet(data));
+    const users = yield call(storageAPI.get, localStorageKey);
+    yield put(usersSet(users));
+    yield put(usersLoadFinish());
   } else {
     //if local storage is empty, get data from API, set to LS, dispatch action
-    yield put(usersLoading());
     try {
-      // throw "myException";
+      yield put(usersLoadStart());
       const data = yield call(fetchUsersFromApi);
-      const json = yield call(
-        () => new Promise((resolve) => resolve(data.json()))
-      );
+      const json = yield call(() => data.json());
 
-      yield call(setLS, json, localStorageKey);
+      yield call(storageAPI.set, json, localStorageKey);
       yield put(usersSet(json));
+      yield put(usersLoadFinish());
     } catch (err) {
-      yield put(usersError()); //if error loading, throw error
+      yield put(usersLoadError()); //if error loading, throw error
     }
   }
 }
 
 function* usersSetWorker(action) {
-  yield call(setLS, action.payload, localStorageKey);
+  yield call(storageAPI.set, action.payload, localStorageKey);
   yield put(usersSet(action.payload));
 }
 
 export function* usersWatcher() {
-  yield takeEvery(USERS_FETCH, usersInitWorker);
-  yield takeEvery(USERS_ASYNC_SET, usersSetWorker);
+  yield all([
+    takeLatest(USERS_ASYNC_FETCH, usersFetchWorker),
+    takeLatest(USERS_ASYNC_SET, usersSetWorker),
+  ]);
 }
