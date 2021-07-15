@@ -14,7 +14,10 @@ const localStorageKey = "app-data-users";
 const fetchUsersFromApi = () => fetch(usersApi);
 
 function* usersInitWorker() {
-  if (localStorage.getItem(localStorageKey) !== null) {
+  if (
+    localStorage.getItem(localStorageKey) !== null &&
+    localStorage.getItem(localStorageKey) !== undefined
+  ) {
     //if local storage is not empty, get data from LS, dispatch action
 
     const data = yield call(getLS, localStorageKey);
