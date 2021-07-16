@@ -20,10 +20,9 @@ import styled from "styled-components";
 import { Edit16, Delete16 } from "@carbon/icons-react";
 
 import { usersAsyncSet } from "../../store/actions/usersActions";
-import AddUserModal from "../AddUserModal";
-import EditUserModal from "../EditUserModal";
-import DeleteUserModal from "../DeleteUserModal";
 import Notification from "../Notification";
+import AppModal from "../AppModal";
+import { generateRandomId } from "../../functions/generateRandomId";
 
 const AppTable = () => {
   const dispatch = useDispatch();
@@ -34,9 +33,7 @@ const AppTable = () => {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-
   const [currentUser, setCurrentUser] = useState(null);
-
   const [notification, setNotification] = useState(null);
 
   const headers = [
@@ -69,38 +66,54 @@ const AppTable = () => {
   const isDataLoaded = usersLoaded && userGroupsLoaded;
   const isDataLoadError = usersError || userGroupsError;
 
-  const handleAddUser = (newUser) => {
+  const handleAddUser = (_newUser) => {
+    const newUser = {..._newUser, id: generateRandomId()}
     const newUsers = [...users, newUser];
     dispatch(usersAsyncSet(newUsers));
+    setNotification({
+      kind: "success",
+      title: `User ${newUser.name} was added`,
+      id: generateRandomId(),
+    });
   };
 
-  const handleEditUser = (currentUser) => {
+  const handleEditUser = (updatedUser) => {
     const newUsers = [...users];
     const indexUpdatedUser = newUsers.findIndex((user) => user.id === currentUser.id);
-
-    newUsers.splice(indexUpdatedUser, 1, currentUser);
+    newUsers.splice(indexUpdatedUser, 1, updatedUser);
     dispatch(usersAsyncSet(newUsers));
+    showNotification({
+      kind: "info",
+      title: `User ${currentUser.name} was edited`,
+      id: generateRandomId(),
+    });
   };
 
-  const handleDeleteUser = (currentUserId) => {
+  const handleDeleteUser = () => {
     const newUsers = [...users];
-    const indexDeletedUser = newUsers.findIndex((user) => user.id === currentUserId);
+    const indexDeletedUser = newUsers.findIndex((user) => user.id === currentUser.id);
     newUsers.splice(indexDeletedUser, 1);
     dispatch(usersAsyncSet(newUsers));
+    showNotification({
+      kind: "error",
+      title: `User ${currentUser.name} was deleted`,
+      id: generateRandomId(),
+    });
   };
 
-  const errorMessage = isDataLoadError && (
-    <div
-      style={{
-        display: "flex",
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        height: "50vh",
-      }}
-    >
-      <h1 style={{ color: "red" }}>Sorry, the service is unavailable</h1>
-    </div>
+  const findAndSetCurrentUser = (id) => {
+    const currentUser = users.find((user) => user.id === id);
+    setCurrentUser(currentUser);
+  };
+
+  const showNotification = (notifConfig) => {
+    setNotification(notifConfig);
+  }
+
+  const renderErrorMessage = () => (
+    <ErrorMessage>
+      <h1>Sorry, the service is unavailable</h1>
+    </ErrorMessage>
   );
 
   const tableHeaders = (headers) => headers?.map(({ header }) => <TableHeader key={header}>{header}</TableHeader>);
@@ -112,42 +125,31 @@ const AppTable = () => {
 
       <TableCell>{row.balance} BYN</TableCell>
 
-      <TableCell
-        style={{
-          color: row.status ? "green" : "maroon",
-        }}
-      >
-        {row.status ? "Active" : "Not active"}
-      </TableCell>
+      <TableCell>{row.status === "Active" ? <ActiveValue>{row.status}</ActiveValue> : <InactiveValue>{row.status}</InactiveValue>}</TableCell>
 
       <TableCell>{row.note}</TableCell>
 
-      <TableCell
-        style={{
-          display: "flex",
-          gap: "5px",
-        }}
-      >
-        <Button
-          renderIcon={Edit16}
-          iconDescription="Edit"
-          hasIconOnly
-          onClick={() => {
-            const currentUser = users.filter(({ id }) => id === row.id)[0];
-            setCurrentUser(currentUser);
-            setEditModalOpen(true);
-          }}
-        />
-        <Button
-          renderIcon={Delete16}
-          iconDescription="Delete"
-          hasIconOnly
-          onClick={() => {
-            const currentUser = users.filter(({ id }) => id === row.id)[0];
-            setCurrentUser(currentUser);
-            setDeleteModalOpen(true);
-          }}
-        />
+      <TableCell>
+        <ControlsContainer>
+          <Button
+            renderIcon={Edit16}
+            iconDescription="Edit"
+            hasIconOnly
+            onClick={() => {
+              findAndSetCurrentUser(row.id);
+              setEditModalOpen(true);
+            }}
+          />
+          <Button
+            renderIcon={Delete16}
+            iconDescription="Delete"
+            hasIconOnly
+            onClick={() => {
+              findAndSetCurrentUser(row.id);
+              setDeleteModalOpen(true);
+            }}
+          />
+        </ControlsContainer>
       </TableCell>
     </>
   );
@@ -161,7 +163,7 @@ const AppTable = () => {
           <TableContainer>
             <TableToolbar>
               <TableToolbarContent>
-                <Button onClick={() => setAddModalOpen(true)}>Add user</Button>
+                <Button onClick={startAddUser}>Add user</Button>
               </TableToolbarContent>
             </TableToolbar>
             <Table>
@@ -179,53 +181,71 @@ const AppTable = () => {
   //   () => renderDataTable(users, headers),
   //   [users]
   // );
+  
+  const startAddUser = () => {
+    setAddModalOpen(true);
+  }
 
-  // const renderNotification =
-  // );
-
-  const renderAddUserModal = addModalOpen && (
-    <AddUserModal
+  const renderAddUserModal = () => (
+    <AppModal
       modalOpen={addModalOpen}
       setModalOpen={setAddModalOpen}
-      handleAddUser={handleAddUser}
       userGroups={userGroups}
-      setNotification={setNotification}
+      handleSubmit={handleAddUser}
+      modalHeading="Add user"
+      primaryButtonText="Apply and add"
     />
   );
 
-  const renderEditModalOpen = editModalOpen && (
-    <EditUserModal
-      currentUser={currentUser}
+  const renderEditUserModal = () => (
+    <AppModal
       modalOpen={editModalOpen}
       setModalOpen={setEditModalOpen}
-      handleEditUser={handleEditUser}
+      initialValues={currentUser}
       userGroups={userGroups}
-      setNotification={setNotification}
+      handleSubmit={handleEditUser}
+      modalHeading={`Apply and edit ${currentUser.name}`}
+      primaryButtonText="Apply changes"
     />
   );
 
-  const renderDeleteModalOpen = deleteModalOpen && (
-    <DeleteUserModal
+  const renderDeleteUserModal = () => (
+    <AppModal
+      withoutInputs
+      danger
       modalOpen={deleteModalOpen}
       setModalOpen={setDeleteModalOpen}
-      setNotification={setNotification}
-      currentUser={currentUser}
-      handleDeleteUser={handleDeleteUser}
+      userGroups={userGroups}
+      handleSubmit={handleDeleteUser}
+      modalHeading={`Are you sure you want to delete ${currentUser.name}`}
+      primaryButtonText="Delete user"
     />
   );
 
   const renderModals = () => {
     return (
       <>
-        {renderAddUserModal}
-        {renderEditModalOpen}
-        {renderDeleteModalOpen}
+        {addModalOpen && renderAddUserModal()}
+        {editModalOpen && renderEditUserModal()}
+        {deleteModalOpen && renderDeleteUserModal()}
       </>
     );
   };
 
-  if (isDataLoadError) return <Grid>{errorMessage}</Grid>;
+  const renderNotification = () => {
+    return (
+      notification && (
+        <NotificationContainer>
+          <Notification notification={notification} setNotification={setNotification} />
+        </NotificationContainer>
+      )
+    );
+  }
 
+  if (isDataLoadError) {
+    return <Grid>{renderErrorMessage()}</Grid>;
+  };
+  
   return (
     <>
       <Grid>
@@ -233,14 +253,12 @@ const AppTable = () => {
         {renderModals()}
         {renderDataTable(users, headers)}
       </Grid>
-      {notification && (
-        <NotificationContainer>
-          <Notification notification={notification} setNotification={setNotification} />
-        </NotificationContainer>
-      )}
+      {renderNotification()}
     </>
   );
 };
+
+export default AppTable;
 
 const NotificationContainer = styled.div`
   background-color: red;
@@ -249,5 +267,21 @@ const NotificationContainer = styled.div`
   width: 100%;
   top: 0;
 `;
-
-export default AppTable;
+const ErrorMessage = styled.div`
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+  color: maroon;
+`;
+const ActiveValue = styled.div`
+  color: green;
+`;
+const InactiveValue = styled.div`
+  color: maroon;
+`;
+const ControlsContainer = styled.div`
+  display: flex;
+  gap: 5px;
+`;

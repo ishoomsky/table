@@ -1,192 +1,134 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import PropTypes from "prop-types";
+import styled from 'styled-components';
 import { useFormik } from "formik";
 import * as Yup from "yup";
 
-import {
-  Modal,
-  Form,
-  FormGroup,
-  TextInput,
-  Select,
-  SelectItem,
-  RadioButtonGroup,
-  RadioButton,
-  TextArea,
-  Loading,
+import { Modal, Form, FormGroup, TextInput, Select, SelectItem, 
+  RadioButtonGroup, RadioButton, TextArea, Loading 
 } from "carbon-components-react";
 
-import { generateRandomId } from "../../functions/generateRandomId";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("Please enter user's name").label("name"),
   group: Yup.string().required("Please choose user's group").label("group"),
-  balance: Yup.number()
-    .typeError("Please enter a number value")
-    .required("Please enter user's balance")
-    .label("balance"),
+  balance: Yup.number().typeError("Please enter a number value").required("Please enter user's balance").label("balance"),
   status: Yup.string().required("Please enter user's status").label("status"),
   note: Yup.string().label("note"),
 });
 
-const EditUserModal = ({
+const AppModal = ({
   modalOpen,
   setModalOpen,
-  handleEditUser,
+  initialValues, 
+  handleSubmit,
   userGroups,
-  setNotification,
-  currentUser,
+  modalHeading,
+  primaryButtonText,
+  withoutInputs,
+  danger
 }) => {
-  const [modalLoading, setModalLoading] = useState(false);
-  const [allFieldsValid, setAllFieldsValid] = useState(false);
-
-  const {
-    id: userId,
-    name: userName,
-    group: userGroup,
-    balance: userBalance,
-    status: userStatus,
-    note: userNote,
-  } = currentUser;
+  const [loading, setLoading] = useState(false);
 
   const formik = useFormik({
-    initialValues: {
-      name: userName,
-      group: userGroup,
-      balance: userBalance,
-      status: userStatus ? "radio-1" : "radio-2",
-      note: userNote,
-    },
-    validationSchema: validationSchema,
+    initialValues,
+    validationSchema: withoutInputs ? null : validationSchema,
+
     onSubmit: (values) => {
-      handleSubmit(values);
+      setLoading(true);
+      setTimeout(() => {
+        handleSubmit(values);
+        setLoading(false);
+        formik.handleReset();
+        setModalOpen(false);
+      }, 200);
     },
   });
 
-  useEffect(() => {
-    let cleanupFunction = false;
-    formik.validateForm().then((errors) => {
-      if (allFieldsValid) {
-        if (
-          (errors &&
-            Object.keys(errors).length === 0 &&
-            errors.constructor === Object) === false
-        ) {
-          if (!cleanupFunction) setAllFieldsValid(false);
-        }
-      }
-
-      //resolving to errors object, and if it empty, change validateState to true
-      if (
-        errors &&
-        Object.keys(errors).length === 0 &&
-        errors.constructor === Object
-      ) {
-        if (!cleanupFunction) setAllFieldsValid(true);
-        return;
-      }
-    });
-    return () => {
-      cleanupFunction = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formik.values]);
-
-  const resetModalForm = () => {
-    formik.handleReset();
-  };
-  const handleSubmit = (values) => {
-    const { name, group, balance, status, note } = values;
-    const editedUser = {
-      id: userId,
-      name: name,
-      group: group,
-      balance: balance,
-      status: status === "radio-1" ? true : false,
-      note: note,
-    };
-    const notification = {
-      kind: "info",
-      title: `User ${name} was edited`,
-      id: generateRandomId(),
-    };
-    setModalLoading(true);
-
-    setTimeout(() => {
-      handleEditUser(editedUser);
-      setModalLoading(false);
-      resetModalForm();
-      setModalOpen(false);
-      setNotification(notification);
-    }, 200);
-  };
   const handleCancel = () => {
-    resetModalForm();
+    formik.handleReset();
     setModalOpen(false);
   };
 
-  const renderModal = modalOpen && (
+  if (withoutInputs) {
+    return (
+      <>
+        <Modal
+          open={modalOpen}
+          danger={danger}
+          modalHeading={modalHeading}
+          primaryButtonText={primaryButtonText}
+          secondaryButtonText={"Cancel"}
+          onRequestSubmit={formik.handleSubmit}
+          onSecondarySubmit={handleCancel}
+          onRequestClose={handleCancel}
+        />
+        <Loading active={loading} />
+      </>
+    );
+  }
+
+  return (
     <Modal
-      modalHeading={"Edit user"}
-      primaryButtonText={"Apply changes"}
-      secondaryButtonText={"Cancel"}
       open={modalOpen}
-      onRequestClose={handleCancel}
       onRequestSubmit={formik.handleSubmit}
+      onRequestClose={handleCancel}
       onSecondarySubmit={handleCancel}
-      primaryButtonDisabled={!allFieldsValid || !formik.dirty}
+      modalHeading={modalHeading}
+      primaryButtonText={primaryButtonText}
+      secondaryButtonText={"Cancel"}
       preventCloseOnClickOutside={true}
+      primaryButtonDisabled={formik.isValid === false || formik.dirty === false}
     >
-      <Loading active={modalLoading} />
+      <Loading active={loading} />
       <Form>
-        <div style={{ marginBottom: "15px" }}>
+        <FormItem>
           <TextInput
-            onChange={formik.handleChange}
+            onInput={formik.handleChange}
             onBlur={formik.handleBlur}
             value={formik.values.name}
             name={"name"}
-            invalid={!!formik.errors.name && !!formik.touched.name}
+            invalid={formik.errors.name && formik.touched.name}
             invalidText={formik.errors.name}
             id="user-name"
             labelText="Enter name"
             placeholder="John Doe"
             autoComplete="off"
           />
-        </div>
-        <div style={{ marginBottom: "15px" }}>
+        </FormItem>
+        <FormItem>
           <Select
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             value={formik.values.group}
-            name={"group"}
-            invalid={!!formik.errors.group && !!formik.touched.group}
+            name="group"
+            invalid={formik.errors.group && formik.touched.group}
             invalidText={formik.errors.group}
             id="user-group"
             labelText="Choose an user's group"
-            autoComplete={"off"}
+            autoComplete="off"
           >
             <SelectItem disabled hidden value="" text="" />
             {userGroups.map((group) => (
               <SelectItem key={group} value={group} text={group} />
             ))}
           </Select>
-        </div>
-        <div style={{ marginBottom: "15px" }}>
+        </FormItem>
+        <FormItem>
           <TextInput
-            onChange={formik.handleChange}
+            onInput={formik.handleChange}
             onBlur={formik.handleBlur}
             value={formik.values.balance}
-            name={"balance"}
-            invalid={!!formik.errors.balance && !!formik.touched.balance}
+            name="balance"
+            invalid={formik.errors.balance && formik.touched.balance}
             invalidText={formik.errors.balance}
             id="user-balance"
             labelText="Enter balance, BYN"
             placeholder="0"
-            autoComplete={"off"}
+            autoComplete="off"
           />
-        </div>
-
-        <div style={{ marginBottom: "5px" }}>
+        </FormItem>
+        <FormItem>
           <FormGroup legendText="Choose user's status">
             <div
               style={
@@ -210,16 +152,8 @@ const EditUserModal = ({
                 valueSelected={formik.values.status}
                 name="status"
               >
-                <RadioButton
-                  labelText="Active"
-                  value="radio-1"
-                  name="radio-1"
-                />
-                <RadioButton
-                  labelText="Not active"
-                  value="radio-2"
-                  name="radio-2"
-                />
+                <RadioButton labelText="Active" value="Active" name="Active" />
+                <RadioButton labelText="Not active" value="Not active" name="Not active" />
               </RadioButtonGroup>
 
               {/* error icon */}
@@ -266,37 +200,45 @@ const EditUserModal = ({
               )}
             </div>
           </FormGroup>
-        </div>
-        <div style={{ marginBottom: "15px" }}>
+        </FormItem>
+        <FormItem>
           <TextArea
-            onChange={formik.handleChange}
+            onInput={formik.handleChange}
             onBlur={formik.handleBlur}
             value={formik.values.note}
-            name={"note"}
-            // invalid={!!formik.errors.note && !!formik.touched.note}
-            // invalidText={formik.errors.note}
-            labelText={"Note"}
+            name="note"
+            labelText="Note"
             rows={2}
-            autoComplete={"off"}
+            autoComplete="off"
           />
-        </div>
+        </FormItem>
       </Form>
     </Modal>
   );
-
-  return renderModal;
 };
 
-export default EditUserModal;
-
-EditUserModal.defaultProps = {
+AppModal.defaultProps = {
+  userId: null,
+  initialValues: {
+    name: "",
+    group: "",
+    balance: "",
+    status: "",
+    note: "",
+  },
   userGroups: [],
 };
 
-EditUserModal.propTypes = {
+AppModal.propTypes = {
   modalOpen: PropTypes.bool.isRequired,
+  userId: PropTypes.string,
   setModalOpen: PropTypes.func.isRequired,
+  initialValues: PropTypes.object,
   userGroups: PropTypes.array,
-  handleEditUser: PropTypes.func.isRequired,
-  setNotification: PropTypes.func.isRequired,
 };
+
+const FormItem = styled.div`
+  margin-bottom: 15px;
+`;
+
+export default AppModal;
