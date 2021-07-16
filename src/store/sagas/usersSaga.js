@@ -8,7 +8,7 @@ import {
 } from "../actions/usersActions";
 import * as storageAPI from "../../functions/localStorageAPI";
 
-const usersApi = "https://api.jsonbin.io/b/60ec02d6a63d2870c1927632";
+const usersApi = "https://api.jsonbin.io/b/60ec02d6a63d2870c1927632/3";
 const localStorageKey = "app-data-users";
 
 const fetchUsersFromApi = () => fetch(usersApi);
