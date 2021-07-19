@@ -24,10 +24,36 @@ import Notification from "../Notification";
 import AppModal from "../AppModal";
 import { generateRandomId } from "../../functions/generateRandomId";
 
+const headers = [
+  {
+    key: "name",
+    header: "Name",
+  },
+  {
+    key: "group",
+    header: "Group",
+  },
+  {
+    key: "balance",
+    header: "Balance",
+  },
+  {
+    key: "status",
+    header: "Status",
+  },
+  {
+    key: "note",
+    header: "Note",
+  },
+  {
+    key: "controls",
+    header: "",
+  },
+];
+
 const AppTable = () => {
   const dispatch = useDispatch();
   const { users, loaded: usersLoaded, error: usersError } = useSelector((state) => state.users);
-
   const { userGroups, loaded: userGroupsLoaded, error: userGroupsError } = useSelector((state) => state.userGroups);
 
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -35,33 +61,6 @@ const AppTable = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [notification, setNotification] = useState(null);
-
-  const headers = [
-    {
-      key: "name",
-      header: "Name",
-    },
-    {
-      key: "group",
-      header: "Group",
-    },
-    {
-      key: "balance",
-      header: "Balance",
-    },
-    {
-      key: "status",
-      header: "Status",
-    },
-    {
-      key: "note",
-      header: "Note",
-    },
-    {
-      key: "controls",
-      header: "",
-    },
-  ];
 
   const isDataLoaded = usersLoaded && userGroupsLoaded;
   const isDataLoadError = usersError || userGroupsError;
@@ -219,6 +218,7 @@ const AppTable = () => {
       handleSubmit={handleDeleteUser}
       modalHeading={`Are you sure you want to delete ${currentUser.name}`}
       primaryButtonText="Delete user"
+      danger
     />
   );
 
@@ -258,8 +258,6 @@ const AppTable = () => {
   );
 };
 
-export default AppTable;
-
 const NotificationContainer = styled.div`
   background-color: red;
   // height: 20px;
@@ -285,3 +283,5 @@ const ControlsContainer = styled.div`
   display: flex;
   gap: 5px;
 `;
+
+export default AppTable;
