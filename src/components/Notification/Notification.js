@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-// import ReactDOM from "react-dom";
 import { PropTypes } from "prop-types";
 import { InlineNotification } from "carbon-components-react";
 import styled from "styled-components";
@@ -10,12 +9,6 @@ const { width: windowWidth } = getWindowDimensions();
 
 const containerWidth = 500;
 const containerPosX = windowWidth / 2 - containerWidth / 2;
-
-const Container = styled.div`
-  position: fixed;
-  width: ${containerWidth}px;
-  left: ${containerPosX}px;
-`;
 
 const Notification = ({ notification, setNotification }) => {
   useEffect(() => {
@@ -32,18 +25,28 @@ const Notification = ({ notification, setNotification }) => {
   return (
     <Container>
       <InlineNotification
-        key={notification?.id}
-        kind={notification?.kind}
-        title={notification?.title}
+        key={notification.id}
+        kind={notification.kind}
+        title={notification.title}
         onClose={() => setNotification(null)}
       />
     </Container>
   );
 };
 
-export default Notification;
-
 Notification.propTypes = {
-  notification: PropTypes.object.isRequired,
+  notification: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    kind: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+  }),
   setNotification: PropTypes.func.isRequired,
 };
+
+const Container = styled.div`
+  position: fixed;
+  width: ${containerWidth}px;
+  left: ${containerPosX}px;
+`;
+
+export default Notification;
