@@ -12,7 +12,7 @@ const usersApi = "https://api.jsonbin.io/b/60ec02d6a63d2870c1927632";
 const localStorageKey = "app-data-user-groups";
 
 const fetchUsersFromApi = () => fetch(usersApi);
-const isLsEmpty = storageAPI.isLocalStorageEmpty(localStorageKey);
+const isLsEmpty = storageAPI.isLocalStorageNotEmpty(localStorageKey);
 
 function* userGroupsFetchWorker() {
   if (isLsEmpty) {

@@ -7,9 +7,6 @@ export const set = (_data, localStorageKey) => {
   localStorage.setItem(localStorageKey, data);
 };
 
-export const isLocalStorageEmpty = (localStorageKey) => {
-  return (
-    localStorage.getItem(localStorageKey) !== null &&
-    localStorage.getItem(localStorageKey) !== undefined
-  );
+export const isLocalStorageNotEmpty = (localStorageKey) => {
+  return localStorage.getItem(localStorageKey) ? true : false;
 };
