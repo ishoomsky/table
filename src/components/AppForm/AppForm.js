@@ -13,7 +13,6 @@ const radioButtonsValues = ["Active", "Not active"];  // I would like to impleme
 const AppForm = ({ userGroups }) => {
 
   return (
-    <>
       <Form className="app-form">
         <AppTextInput name="name" inputId="user-name" labelText="Enter name" placeholder="John Doe" isRequired />
         <AppSelectInput name="group" inputId="user-group" labelText="Choose an user's group" userGroups={userGroups} isRequired />
@@ -21,23 +20,14 @@ const AppForm = ({ userGroups }) => {
         <AppRadioButtonGroup name="status" labelText="Choose user's status" radioButtonValues={radioButtonsValues} />
         <AppTextArea name="note" inputId="user-note" labelText="Notes:" placeholder="0" isRequired />
       </Form>
-    </>
   );
 };
 
 AppForm.defaultProps = {
-  initialValues: {
-    name: "",
-    group: "",
-    balance: "",
-    status: "",
-    note: "",
-  },
   userGroups: [],
 };
 
 AppForm.propTypes = {
-  initialValues: PropTypes.object,
   userGroups: PropTypes.array,
 };
 
