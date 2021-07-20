@@ -124,7 +124,7 @@ const MainPage = () => {
       primaryButtonText="Delete user"
     />
   );
-  const renderLoader = isDataLoaded === false && <Loading active />;
+  const renderLoader = (isDataLoaded === false) && <Loading active />;
   const renderModals = (
     <>
       {addModalOpen && renderAddUserModal()}
