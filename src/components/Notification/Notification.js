@@ -3,7 +3,7 @@ import { PropTypes } from "prop-types";
 import { InlineNotification } from "carbon-components-react";
 import styled from "styled-components";
 
-import getWindowDimensions from "../../functions/getWindowDimensions";
+import { getWindowDimensions } from "../../functions/utilities";
 
 const { width: windowWidth } = getWindowDimensions();
 

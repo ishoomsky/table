@@ -7,7 +7,7 @@ import AppTable from "../../components/AppTable";
 import AppModal from "../../components/AppModal";
 import Notification from "../../components/Notification";
 import AppErrorMessage from "../../components/AppErrorMessage";
-import { generateRandomId } from "../../functions/generateRandomId";
+import { generateRandomId } from "../../functions/utilities";
 
 const headers = [
   {
@@ -119,7 +119,6 @@ const MainPage = () => {
       danger
       modalOpen={deleteModalOpen}
       setModalOpen={setDeleteModalOpen}
-      userGroups={userGroups}
       handleSubmit={handleDeleteUser}
       modalHeading={`Are you sure you want to delete ${currentUser.name}`}
       primaryButtonText="Delete user"

@@ -28,7 +28,6 @@ const AppModal = ({
   ...otherProps
 }) => {
   const [loading, setLoading] = useState(false);
-
   return (
     <Formik
       initialValues={initialValues}
@@ -63,7 +62,7 @@ const AppModal = ({
           primaryButtonDisabled={withoutInputs === false && (isValid === false || dirty === false || touched === false)}
         >
           <Loading active={loading} />
-          {!withoutInputs && <AppForm {...otherProps} />}
+          {!withoutInputs && <AppForm userGroups={userGroups} />}
         </Modal>
       )}
     </Formik>
