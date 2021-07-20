@@ -10,7 +10,7 @@ import AppRadioButtonGroup from "../form/AppRadioButtonGroup";
 
 const radioButtonsValues = ["Active", "Not active"];  // I would like to implement it 
 
-const AppForm = ({userGroups}) => {
+const AppForm = ({ userGroups }) => {
 
   return (
     <>
