@@ -49,7 +49,7 @@ const AppTable = ({ users, headers, findAndSetCurrentUser, setEditModalOpen, set
       </TableCell>
     </>
   );
-  const tableRows = (rows) => rows.map((row) => <TableRow key={row.id}>{tableCells(row)}</TableRow>);
+  const tableRows = () => users.map((user) => <TableRow key={user.id}>{tableCells(user)}</TableRow>);
   const renderDataTable = () => {
     return (
       <DataTable rows={users} headers={headers}>
@@ -64,7 +64,7 @@ const AppTable = ({ users, headers, findAndSetCurrentUser, setEditModalOpen, set
               <TableHead>
                 <TableRow>{tableHeaders()}</TableRow>
               </TableHead>
-              <TableBody>{tableRows(users)}</TableBody>
+              <TableBody>{tableRows()}</TableBody>
             </Table>
           </TableContainer>
         )}
