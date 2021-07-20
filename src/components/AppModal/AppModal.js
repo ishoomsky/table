@@ -63,7 +63,7 @@ const AppModal = ({
           primaryButtonDisabled={withoutInputs === false && (isValid === false || dirty === false || touched === false)}
         >
           <Loading active={loading} />
-          {!withoutInputs && <AppForm userGroups={userGroups} props={otherProps} />}
+          {!withoutInputs && <AppForm {...otherProps} />}
         </Modal>
       )}
     </Formik>
@@ -71,7 +71,8 @@ const AppModal = ({
 };
 
 AppModal.defaultProps = {
-  userId: null,
+  withoutInputs: false,
+  userGroups: [],
   initialValues: {
     name: "",
     group: "",
@@ -79,18 +80,24 @@ AppModal.defaultProps = {
     status: "",
     note: "",
   },
-  userGroups: [],
-  withoutInputs: false,
+  userId: null,
+  primaryButtonText: "",
+  modalHeading: "",
+  danger: false,
+
 };
 
 AppModal.propTypes = {
   modalOpen: PropTypes.bool.isRequired,
   withoutInputs: PropTypes.bool,
-  userId: PropTypes.string,
-  setModalOpen: PropTypes.func.isRequired,
-  initialValues: PropTypes.object,
   userGroups: PropTypes.array,
+  initialValues: PropTypes.object,
+  userId: PropTypes.string,
+  primaryButtonText: PropTypes.string,
+  modalHeading: PropTypes.string,
+  danger: PropTypes.bool,
+  handleSubmit: PropTypes.func.isRequired,
+  setModalOpen: PropTypes.func.isRequired,
 };
-
 
 export default AppModal;

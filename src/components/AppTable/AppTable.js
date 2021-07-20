@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 import {
   DataTable,
   TableContainer,
@@ -12,15 +13,11 @@ import {
   TableToolbarContent,
   Button,
 } from "carbon-components-react";
-
 import styled from "styled-components";
 import { Edit16, Delete16 } from "@carbon/icons-react";
 
-
-
-const AppTable = ({ users, headers, findAndSetCurrentUser, setEditModalOpen, setDeleteModalOpen, startAddUser }) => {
+const AppTable = ({ users, headers, findAndSetCurrentUser, setEditModalOpen, setDeleteModalOpen, setAddModalOpen }) => {
   const tableHeaders = (headers) => headers.map(({ header }) => <TableHeader key={header}>{header}</TableHeader>);
-
   const tableCells = (row) => (
     <>
       <TableCell>{row.name}</TableCell>
@@ -52,9 +49,7 @@ const AppTable = ({ users, headers, findAndSetCurrentUser, setEditModalOpen, set
       </TableCell>
     </>
   );
-
   const tableRows = (rows) => rows.map((row) => <TableRow key={row.id}>{tableCells(row)}</TableRow>);
-
   const renderDataTable = () => {
     return (
       <DataTable rows={users} headers={headers}>
@@ -62,7 +57,7 @@ const AppTable = ({ users, headers, findAndSetCurrentUser, setEditModalOpen, set
           <TableContainer>
             <TableToolbar>
               <TableToolbarContent>
-                <Button onClick={startAddUser}>Add user</Button>
+                <Button onClick={() => setAddModalOpen(true)}>Add user</Button>
               </TableToolbarContent>
             </TableToolbar>
             <Table>
@@ -90,5 +85,38 @@ const ControlsContainer = styled.div`
   display: flex;
   gap: 5px;
 `;
+
+AppTable.defaultProps = {
+  users: [],
+};
+
+AppTable.propTypes = {
+  users: PropTypes.arrayOf(
+    PropTypes.shape({
+      balance: PropTypes.oneOfType(
+        [
+          PropTypes.string,
+          PropTypes.number
+        ]
+      ).isRequired,
+      group: PropTypes.string.isRequired,
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      note: PropTypes.string,
+      status: PropTypes.string.isRequired,
+    })
+  ),
+  headers: PropTypes.arrayOf(
+    PropTypes.shape({
+      key: PropTypes.string.isRequired,
+      header: PropTypes.string.isRequired,
+    })
+  ),
+  findAndSetCurrentUser: PropTypes.func.isRequired,
+  setEditModalOpen: PropTypes.func.isRequired,
+  setDeleteModalOpen: PropTypes.func.isRequired,
+  setAddModalOpen: PropTypes.func.isRequired,
+};
+
 
 export default AppTable;

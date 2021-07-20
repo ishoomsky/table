@@ -5,7 +5,6 @@ import { useFormikContext } from "formik";
 import { RadioButtonGroup, RadioButton } from "carbon-components-react";
 import { WarningFilled16 } from "@carbon/icons-react";
 
-
 const AppRadioButtonGroup = ({ name, labelText, radioButtonValues }) => {
   const { values, errors, touched, setFieldValue } = useFormikContext();
   const radioButtons = radioButtonValues.map((radioButtonValue) => (
@@ -35,11 +34,6 @@ const AppRadioButtonGroup = ({ name, labelText, radioButtonValues }) => {
       </RadioButtonGroupContainer>
     </>
   );
-};
-
-AppRadioButtonGroup.propTypes = {
-  name: PropTypes.string.isRequired,
-  radioButtonValues: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
 };
 
 const RadioButtonGroupContainer = styled.div`
@@ -80,5 +74,14 @@ const ErrorMessageWrapper = styled.div`
   font-size: 12px;
 `;
 
+AppRadioButtonGroup.defaultProps = {
+  labelText: "",
+};
+
+AppRadioButtonGroup.propTypes = {
+  name: PropTypes.string.isRequired,
+  labelText: PropTypes.string,
+  radioButtonValues: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+};
 
 export default AppRadioButtonGroup;

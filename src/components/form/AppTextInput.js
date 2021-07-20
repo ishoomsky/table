@@ -24,14 +24,17 @@ const AppTextInput = ({ name, inputId, labelText, placeholder, autoComplete, isR
 AppTextInput.defaultProps = {
   placeholder: "",
   autoComplete: "off",
+  labelText: "",
+  isRequired: false,
 };
 
 AppTextInput.propTypes = {
   name: PropTypes.string.isRequired,
   inputId: PropTypes.string.isRequired,
-  labelText: PropTypes.string.isRequired,
+  labelText: PropTypes.string,
   placeholder: PropTypes.string,
-  autoComplete: PropTypes.oneOf(['on', 'off']),
+  autoComplete: PropTypes.oneOf(["on", "off"]),
+  isRequired: PropTypes.bool,
 };
 
 export default AppTextInput;

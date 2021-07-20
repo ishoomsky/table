@@ -23,14 +23,11 @@ const Notification = ({ notification, setNotification }) => {
   }, [notification]);
 
   return (
-    <Container>
-      <InlineNotification
-        key={notification.id}
-        kind={notification.kind}
-        title={notification.title}
-        onClose={() => setNotification(null)}
-      />
-    </Container>
+    <NotificationContainer>
+      <Container>
+        <InlineNotification key={notification.id} kind={notification.kind} title={notification.title} onClose={() => setNotification(null)} />
+      </Container>
+    </NotificationContainer>
   );
 };
 
@@ -47,6 +44,13 @@ const Container = styled.div`
   position: fixed;
   width: ${containerWidth}px;
   left: ${containerPosX}px;
+`;
+
+const NotificationContainer = styled.div`
+  background-color: red;
+  position: fixed;
+  width: 100%;
+  top: 0;
 `;
 
 export default Notification;

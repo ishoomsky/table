@@ -24,14 +24,17 @@ AppTextArea.defaultProps = {
   placeholder: "",
   row: 2,
   autoComplete: "off",
+  labelText: "",
+  isRequired: false,
 };
 
 AppTextArea.propTypes = {
   name: PropTypes.string.isRequired,
-  labelText: PropTypes.string.isRequired,
+  labelText: PropTypes.string,
   placeholder: PropTypes.string,
   row: PropTypes.number,
   autoComplete: PropTypes.oneOf(["on", "off"]),
+  isRequired: PropTypes.bool,
 };
 
 export default AppTextArea;

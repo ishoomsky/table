@@ -24,12 +24,17 @@ const AppSelectInput = ({ name, inputId, labelText, userGroups, isRequired }) =>
   );
 };
 
+AppSelectInput.defaultProps = {
+  labelText: "",
+  isRequired: false,
+};
 
 AppSelectInput.propTypes = {
   name: PropTypes.string.isRequired,
   inputId: PropTypes.string.isRequired,
-  labelText: PropTypes.string.isRequired,
+  labelText: PropTypes.string,
   userGroups: PropTypes.array.isRequired,
+  isRequired: PropTypes.bool,
 };
 
 export default AppSelectInput;
