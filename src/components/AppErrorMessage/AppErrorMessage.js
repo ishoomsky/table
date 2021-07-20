@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from "styled-components";
 
-function AppErrorMessage(props) {
+const AppErrorMessage =() => {
   return (
       <ErrorMessage>
         <h1>Sorry, the service is unavailable</h1>
