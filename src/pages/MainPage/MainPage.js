@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import styled from "styled-components";
 import { Grid, Loading } from "carbon-components-react";
 
 import { usersAsyncSet } from "../../store/actions/usersActions";
@@ -51,10 +50,6 @@ const MainPage = () => {
   const isDataLoaded = usersLoaded && userGroupsLoaded;
   const isDataLoadError = usersError || userGroupsError;
 
-  const startAddUser = () => {
-    setAddModalOpen(true);
-  };
-  
   const handleAddUser = (_newUser) => {
     const newUser = { ..._newUser, id: generateRandomId() };
     const newUsers = [...users, newUser];
@@ -65,7 +60,6 @@ const MainPage = () => {
       id: generateRandomId(),
     });
   };
-
   const handleEditUser = (updatedUser) => {
     const newUsers = [...users];
     const indexUpdatedUser = newUsers.findIndex((user) => user.id === currentUser.id);
@@ -77,7 +71,6 @@ const MainPage = () => {
       id: generateRandomId(),
     });
   };
-
   const handleDeleteUser = () => {
     const newUsers = [...users];
     const indexDeletedUser = newUsers.findIndex((user) => user.id === currentUser.id);
@@ -99,8 +92,6 @@ const MainPage = () => {
     setNotification(notifConfig);
   };
 
-
-
   const renderAddUserModal = () => (
     <AppModal
       modalOpen={addModalOpen}
@@ -111,7 +102,6 @@ const MainPage = () => {
       primaryButtonText="Apply and add"
     />
   );
-
   const renderEditUserModal = () => (
     <AppModal
       modalOpen={editModalOpen}
@@ -123,7 +113,6 @@ const MainPage = () => {
       primaryButtonText="Apply changes"
     />
   );
-
   const renderDeleteUserModal = () => (
     <AppModal
       withoutInputs
@@ -134,10 +123,9 @@ const MainPage = () => {
       handleSubmit={handleDeleteUser}
       modalHeading={`Are you sure you want to delete ${currentUser.name}`}
       primaryButtonText="Delete user"
-      danger
     />
   );
-
+  const renderLoader = isDataLoaded === false && <Loading active />;
   const renderModals = (
     <>
       {addModalOpen && renderAddUserModal()}
@@ -145,12 +133,7 @@ const MainPage = () => {
       {deleteModalOpen && renderDeleteUserModal()}
     </>
   );
-
-  const renderNotification = notification && (
-    <NotificationContainer>
-      <Notification notification={notification} setNotification={setNotification} />
-    </NotificationContainer>
-  );
+  const renderNotification = notification && <Notification notification={notification} setNotification={setNotification} />;
 
   if (isDataLoadError) {
     return <Grid>
@@ -161,29 +144,20 @@ const MainPage = () => {
   return (
     <>
       <Grid>
-        <Loading active={!isDataLoaded} />
-        {renderModals}
         <AppTable
           users={users}
           headers={headers}
           findAndSetCurrentUser={findAndSetCurrentUser}
           setEditModalOpen={setEditModalOpen}
           setDeleteModalOpen={setDeleteModalOpen}
-          startAddUser={startAddUser}
+          setAddModalOpen={setAddModalOpen}
         />
+        {renderLoader}
+        {renderModals}
       </Grid>
       {renderNotification}
     </>
   );
 };
-
-const NotificationContainer = styled.div`
-  background-color: red;
-  // height: 20px;
-  position: fixed;
-  width: 100%;
-  top: 0;
-`;
-
 
 export default MainPage;
