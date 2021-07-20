@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { usersAsyncFetch } from "./store/actions/usersActions";
 import { userGroupsAsyncFetch } from "./store/actions/userGroupsActions";
 
-import MainPage from "./pages/MainPage";
+import TablePage from "./pages/TablePage";
 
 function App() {
   const dispatch = useDispatch();
@@ -14,7 +14,7 @@ function App() {
     dispatch(userGroupsAsyncFetch());
   }, []);
 
-  return <MainPage />;
+  return <TablePage />;
 }
 
 export default App;
