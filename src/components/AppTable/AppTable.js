@@ -17,14 +17,14 @@ import styled from "styled-components";
 import { Edit16, Delete16 } from "@carbon/icons-react";
 
 const AppTable = ({ users, headers, findAndSetCurrentUser, setEditModalOpen, setDeleteModalOpen, setAddModalOpen }) => {
-  const tableHeaders = (headers) => headers.map(({ header }) => <TableHeader key={header}>{header}</TableHeader>);
-  const tableCells = (row) => (
+  const tableHeaders = () => headers.map(({ header }) => <TableHeader key={header}>{header}</TableHeader>);
+  const tableCells = ({ id, name, group, balance, status, note }) => (
     <>
-      <TableCell>{row.name}</TableCell>
-      <TableCell>{row.group}</TableCell>
-      <TableCell>{row.balance} BYN</TableCell>
-      <TableCell>{row.status === "Active" ? <ActiveValue>{row.status}</ActiveValue> : <InactiveValue>{row.status}</InactiveValue>}</TableCell>
-      <TableCell>{row.note}</TableCell>
+      <TableCell>{name}</TableCell>
+      <TableCell>{group}</TableCell>
+      <TableCell>{balance} BYN</TableCell>
+      <TableCell>{status === "Active" ? <ActiveValue>{status}</ActiveValue> : <InactiveValue>{status}</InactiveValue>}</TableCell>
+      <TableCell>{note}</TableCell>
       <TableCell>
         <ControlsContainer>
           <Button
@@ -32,7 +32,7 @@ const AppTable = ({ users, headers, findAndSetCurrentUser, setEditModalOpen, set
             iconDescription="Edit"
             hasIconOnly
             onClick={() => {
-              findAndSetCurrentUser(row.id);
+              findAndSetCurrentUser(id);
               setEditModalOpen(true);
             }}
           />
@@ -41,7 +41,7 @@ const AppTable = ({ users, headers, findAndSetCurrentUser, setEditModalOpen, set
             iconDescription="Delete"
             hasIconOnly
             onClick={() => {
-              findAndSetCurrentUser(row.id);
+              findAndSetCurrentUser(id);
               setDeleteModalOpen(true);
             }}
           />
@@ -62,7 +62,7 @@ const AppTable = ({ users, headers, findAndSetCurrentUser, setEditModalOpen, set
             </TableToolbar>
             <Table>
               <TableHead>
-                <TableRow>{tableHeaders(headers)}</TableRow>
+                <TableRow>{tableHeaders()}</TableRow>
               </TableHead>
               <TableBody>{tableRows(users)}</TableBody>
             </Table>
