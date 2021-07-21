@@ -126,13 +126,6 @@ const TablePage = () => {
     />
   );
   const renderLoader = isDataLoaded === false && <Loading active />;
-  const renderModals = (
-    <>
-      {addModalOpen && renderAddUserModal()}
-      {editModalOpen && renderEditUserModal()}
-      {deleteModalOpen && renderDeleteUserModal()}
-    </>
-  );
   const renderNotification = notification && <Notification notification={notification} setNotification={setNotification} />;
 
   if (isDataLoadError) {
@@ -155,7 +148,9 @@ const TablePage = () => {
           setAddModalOpen={setAddModalOpen}
         />
         {renderLoader}
-        {renderModals}
+        {addModalOpen && renderAddUserModal()}
+        {editModalOpen && renderEditUserModal()}
+        {deleteModalOpen && renderDeleteUserModal()}
       </Grid>
       {renderNotification}
     </AppPage>
