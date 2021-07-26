@@ -7,7 +7,7 @@ import AppPage from "../../components/AppPage";
 
 const UserPage = () => {
   const { params: { userId } } = useRouteMatch();
-  const { users, loaded: usersLoaded, error: usersError } = useSelector((state) => state.users);
+  const { users } = useSelector((state) => state.users);
   const [ currentUser, setCurrentUser ] = useState(null);
 
   useEffect(()=>{
