@@ -1,5 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
+import { useHistory, Link } from "react-router-dom";
 import {
   DataTable,
   TableContainer,
@@ -15,15 +16,27 @@ import {
 } from "carbon-components-react";
 import styled from "styled-components";
 import { Edit16, Delete16 } from "@carbon/icons-react";
+import * as routes from "../../navigation/routes";
 
 const AppTable = ({ users, headers, findAndSetCurrentUser, setEditModalOpen, setDeleteModalOpen, setAddModalOpen }) => {
+  const history = useHistory();
   const tableHeaders = () => headers.map(({ header }) => <TableHeader key={header}>{header}</TableHeader>);
   const tableCells = ({ id, name, group, balance, status, note }) => (
     <>
-      <TableCell>{name}</TableCell>
+      <TableCell>
+        <TableCellLink>
+          <Link className="table-link" target="_blank" to={`${routes.USER}${id}`}>{name}</Link>
+        </TableCellLink>
+      </TableCell>
       <TableCell>{group}</TableCell>
       <TableCell>{balance} BYN</TableCell>
-      <TableCell>{status === "Active" ? <ActiveValue>{status}</ActiveValue> : <InactiveValue>{status}</InactiveValue>}</TableCell>
+      <TableCell>
+        {status === "Active" ? (
+          <ActiveValue>{status}</ActiveValue>
+        ) : (
+          <InactiveValue>{status}</InactiveValue>
+        )}
+      </TableCell>
       <TableCell>{note}</TableCell>
       <TableCell>
         <ControlsContainer>
@@ -84,6 +97,9 @@ const InactiveValue = styled.div`
 const ControlsContainer = styled.div`
   display: flex;
   gap: 5px;
+`;
+const TableCellLink = styled.span`
+  cursor: pointer;
 `;
 
 AppTable.defaultProps = {
