@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Grid, Loading } from "carbon-components-react";
+import { Loading } from "carbon-components-react";
 
 import { usersAsyncSet } from "../../store/actions/usersActions";
 import AppTable from "../../components/AppTable";
 import AppModal from "../../components/AppModal";
+import AppModalWithForm from "../../components/AppModalWithForm";
 import Notification from "../../components/Notification";
 import AppErrorMessage from "../../components/AppErrorMessage";
 import AppPage from "../../components/AppPage";
@@ -43,6 +44,7 @@ const TablePage = () => {
   const { userGroups, loaded: userGroupsLoaded, error: userGroupsError } = useSelector((state) => state.userGroups);
 
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [modalLoading, setModalLoading] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
@@ -93,66 +95,60 @@ const TablePage = () => {
     setNotification(notifConfig);
   };
 
-  const renderAddUserModal = () => (
-    <AppModal
-      modalOpen={addModalOpen}
-      setModalOpen={setAddModalOpen}
-      userGroups={userGroups}
-      handleSubmit={handleAddUser}
-      modalHeading="Add user"
-      primaryButtonText="Apply and add"
-    />
-  );
-  const renderEditUserModal = () => (
-    <AppModal
-      modalOpen={editModalOpen}
-      setModalOpen={setEditModalOpen}
-      initialValues={currentUser}
-      userGroups={userGroups}
-      handleSubmit={handleEditUser}
-      modalHeading={`Apply and edit ${currentUser.name}`}
-      primaryButtonText="Apply changes"
-    />
-  );
-  const renderDeleteUserModal = () => (
-    <AppModal
-      withoutInputs
-      danger
-      modalOpen={deleteModalOpen}
-      setModalOpen={setDeleteModalOpen}
-      handleSubmit={handleDeleteUser}
-      modalHeading={`Are you sure you want to delete ${currentUser.name}`}
-      primaryButtonText="Delete user"
-    />
-  );
-  const renderLoader = isDataLoaded === false && <Loading active />;
-  const renderNotification = notification && <Notification notification={notification} setNotification={setNotification} />;
+  const appTableProps = () => ({
+    users: users,
+    headers: headers,
+    findAndSetCurrentUser: findAndSetCurrentUser,
+    setEditModalOpen: setEditModalOpen,
+    setDeleteModalOpen: setDeleteModalOpen,
+    setAddModalOpen: setAddModalOpen,
+  });
+  const addModalProps = () => ({
+    onSubmit: handleAddUser,
+    modalOpen: addModalOpen,
+    setModalOpen: setAddModalOpen,
+    modalLoading: modalLoading,
+    setModalLoading: setModalLoading,
+    userGroups: userGroups,
+    modalHeading: "Add user",
+    primaryButtonText: "Apply and add",
+  });
+  const editModalProps = () => ({
+    onSubmit: handleEditUser,
+    modalOpen: editModalOpen,
+    setModalOpen: setEditModalOpen,
+    modalLoading: modalLoading,
+    setModalLoading: setModalLoading,
+    initialValues: currentUser,
+    userGroups: userGroups,
+    modalHeading: `Apply and edit ${currentUser.name}`,
+    primaryButtonText: "Apply changes",
+  });
+  const deleteModalProps = () => ({
+      onSubmit: handleDeleteUser,
+      modalOpen: deleteModalOpen,
+      setModalOpen: setDeleteModalOpen,
+      modalLoading: modalLoading,
+      setModalLoading: setModalLoading,
+      modalHeading: `Are you sure you want to delete ${currentUser.name}`,
+      primaryButtonText: "Delete user",
+      danger: true,
+  });
+  const notificationProps = () => ({
+    notification: notification,
+    setNotification: setNotification,
+  })
 
-  if (isDataLoadError) {
-    return (
-      <Grid>
-        <AppErrorMessage />
-      </Grid>
-    );
-  }
+  if (isDataLoadError) return <AppErrorMessage />;
 
   return (
     <AppPage>
-      <Grid>
-        <AppTable
-          users={users}
-          headers={headers}
-          findAndSetCurrentUser={findAndSetCurrentUser}
-          setEditModalOpen={setEditModalOpen}
-          setDeleteModalOpen={setDeleteModalOpen}
-          setAddModalOpen={setAddModalOpen}
-        />
-        {renderLoader}
-        {addModalOpen && renderAddUserModal()}
-        {editModalOpen && renderEditUserModal()}
-        {deleteModalOpen && renderDeleteUserModal()}
-      </Grid>
-      {renderNotification}
+      <AppTable {...appTableProps()} />
+      {!isDataLoaded && <Loading active />}
+      {addModalOpen && <AppModalWithForm {...addModalProps()} />}
+      {editModalOpen && <AppModalWithForm {...editModalProps()} />}
+      {deleteModalOpen && <AppModal {...deleteModalProps()} />}
+      {notification && <Notification {...notificationProps()} />}
     </AppPage>
   );
 };
