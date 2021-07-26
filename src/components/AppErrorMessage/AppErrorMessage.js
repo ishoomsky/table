@@ -1,13 +1,7 @@
 import React from 'react';
 import styled from "styled-components";
 
-const AppErrorMessage =() => {
-  return (
-      <ErrorMessage>
-        <h1>Sorry, the service is unavailable</h1>
-      </ErrorMessage>
-  );
-}
+const AppErrorMessage = () => <ErrorMessage>Sorry, the service is unavailable</ErrorMessage>;
 
 const ErrorMessage = styled.div`
   display: flex;
@@ -16,6 +10,7 @@ const ErrorMessage = styled.div`
   align-items: center;
   height: 50vh;
   color: maroon;
+  font-size: 22px;
 `;
 
 export default AppErrorMessage;
