@@ -1,5 +1,10 @@
 export const isEmptyObject = (obj) => {
-  return obj && Object.keys(obj).length === 0 && obj.constructor === Object;
+  for (var prop in obj) {
+    if (obj.hasOwnProperty(prop)) {
+      return false;
+    }
+  }
+  return JSON.stringify(obj) === JSON.stringify({});
 };
 
 export const generateRandomId = () => {
