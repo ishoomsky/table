@@ -6,8 +6,8 @@ import {
 } from "../actions/actionTypes";
 
 const initState = {
-  loaded: null,
-  error: null,
+  loaded: false,
+  error: false,
   userGroups: [],
 };
 
