@@ -24,17 +24,13 @@ const Notification = ({ notification, setNotification }) => {
 
   return (
     <Container>
-      <InlineNotification key={notification.id} kind={notification.kind} title={notification.title} onClose={() => setNotification(null)} />
+      <InlineNotification kind="success" title={notification} onClose={() => setNotification(null)} />
     </Container>
   );
 };
 
 Notification.propTypes = {
-  notification: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    kind: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-  }),
+  notification: PropTypes.string.isRequired,
   setNotification: PropTypes.func.isRequired,
 };
 

@@ -56,34 +56,19 @@ const TablePage = () => {
   const handleAddUser = (_newUser) => {
     const newUser = { ..._newUser, id: generateRandomId() };
     const newUsers = [...users, newUser];
-    dispatch(usersAsyncSet(newUsers));
-    setNotification({
-      kind: "success",
-      title: `User ${newUser.name} was added`,
-      id: generateRandomId(),
-    });
+    setData(newUsers, `User ${newUser.name} was added`);
   };
   const handleEditUser = (updatedUser) => {
     const newUsers = [...users];
     const indexUpdatedUser = newUsers.findIndex((user) => user.id === currentUser.id);
     newUsers.splice(indexUpdatedUser, 1, updatedUser);
-    dispatch(usersAsyncSet(newUsers));
-    showNotification({
-      kind: "info",
-      title: `User ${currentUser.name} was edited`,
-      id: generateRandomId(),
-    });
+    setData(newUsers, `User ${currentUser.name} was edited`);
   };
   const handleDeleteUser = () => {
     const newUsers = [...users];
     const indexDeletedUser = newUsers.findIndex((user) => user.id === currentUser.id);
     newUsers.splice(indexDeletedUser, 1);
-    dispatch(usersAsyncSet(newUsers));
-    showNotification({
-      kind: "error",
-      title: `User ${currentUser.name} was deleted`,
-      id: generateRandomId(),
-    });
+    setData(newUsers, `User ${currentUser.name} was deleted`);
   };
 
   const findAndSetCurrentUser = (id) => {
@@ -91,19 +76,20 @@ const TablePage = () => {
     setCurrentUser(currentUser);
   };
 
-  const showNotification = (notifConfig) => {
-    setNotification(notifConfig);
+  const setData = (newData, notification) => {
+    dispatch(usersAsyncSet(newData));
+    setNotification(notification);
   };
 
-  const appTableProps = () => ({
+  const appTableProps = {
     users: users,
     headers: headers,
     findAndSetCurrentUser: findAndSetCurrentUser,
     setEditModalOpen: setEditModalOpen,
     setDeleteModalOpen: setDeleteModalOpen,
     setAddModalOpen: setAddModalOpen,
-  });
-  const addModalProps = () => ({
+  };
+  const addModalProps = {
     onSubmit: handleAddUser,
     modalOpen: addModalOpen,
     setModalOpen: setAddModalOpen,
@@ -112,7 +98,7 @@ const TablePage = () => {
     userGroups: userGroups,
     modalHeading: "Add user",
     primaryButtonText: "Apply and add",
-  });
+  };
   const editModalProps = () => ({
     onSubmit: handleEditUser,
     modalOpen: editModalOpen,
@@ -125,14 +111,14 @@ const TablePage = () => {
     primaryButtonText: "Apply changes",
   });
   const deleteModalProps = () => ({
-      onSubmit: handleDeleteUser,
-      modalOpen: deleteModalOpen,
-      setModalOpen: setDeleteModalOpen,
-      modalLoading: modalLoading,
-      setModalLoading: setModalLoading,
-      modalHeading: `Are you sure you want to delete ${currentUser.name}`,
-      primaryButtonText: "Delete user",
-      danger: true,
+    onSubmit: handleDeleteUser,
+    modalOpen: deleteModalOpen,
+    setModalOpen: setDeleteModalOpen,
+    modalLoading: modalLoading,
+    setModalLoading: setModalLoading,
+    modalHeading: `Are you sure you want to delete ${currentUser.name}`,
+    primaryButtonText: "Delete user",
+    danger: true,
   });
   const notificationProps = () => ({
     notification: notification,
@@ -143,9 +129,9 @@ const TablePage = () => {
 
   return (
     <AppPage>
-      <AppTable {...appTableProps()} />
+      <AppTable {...appTableProps} />
       {!isDataLoaded && <Loading active />}
-      {addModalOpen && <AppModalWithForm {...addModalProps()} />}
+      {addModalOpen && <AppModalWithForm {...addModalProps} />}
       {editModalOpen && <AppModalWithForm {...editModalProps()} />}
       {deleteModalOpen && <AppModal {...deleteModalProps()} />}
       {notification && <Notification {...notificationProps()} />}
