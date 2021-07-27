@@ -28,9 +28,7 @@ const UserPage = () => {
         <ParameterSpan>Group: {currentUser.group}</ParameterSpan>
         <ParameterSpan>Balance: {currentUser.balance}</ParameterSpan>
         <ParameterSpan>Status: {currentUser.status}</ParameterSpan>
-        <ParameterSpan>
-          Note: {currentUser.note} {!currentUser.note && "no info"}
-        </ParameterSpan>
+        <ParameterSpan>Note: {currentUser.note || "no info"}</ParameterSpan>
       </ContentContainer>
     </AppPage>
   );
