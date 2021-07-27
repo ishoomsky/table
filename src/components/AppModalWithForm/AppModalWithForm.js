@@ -15,26 +15,29 @@ const validationSchema = Yup.object().shape({
 });
 
 const AppModal = (props) => {
-  const { modalOpen, setModalOpen, modalLoading, userGroups, modalHeading, primaryButtonText, danger } = props;
+  const { modalOpen, setModalOpen, modalLoading, userGroups, modalHeading, primaryButtonText, danger, handleSubmit, handleReset } = props;
+
+  const handleClose = () => {
+    handleReset();
+    setModalOpen(false);
+  };
 
   return (
     <Modal
       open={modalOpen}
-      onRequestSubmit={props.handleSubmit}
+      onRequestSubmit={handleSubmit}
       onRequestClose={() => {
-        props.handleReset();
-        setModalOpen(false);
+        handleClose();
       }}
       onSecondarySubmit={() => {
-        props.handleReset();
-        setModalOpen(false);
+        handleClose();
       }}
       modalHeading={modalHeading}
       primaryButtonText={primaryButtonText}
       secondaryButtonText="Cancel"
       preventCloseOnClickOutside={true}
       danger={danger}
-      primaryButtonDisabled={props.isValid === false || props.dirty === false || props.touched === false}
+      primaryButtonDisabled={!props.isValid || !props.dirty || !props.touched}
     >
       <Loading active={modalLoading} />
       <AppForm userGroups={userGroups} />
@@ -55,25 +58,27 @@ const WithFormik = withFormik({
     }, 200);
   },
   mapPropsToValues: (props) => ({
-    name: props?.initialValues?.name || "",
-    group: props?.initialValues?.group || "",
-    balance: props?.initialValues?.balance || "",
-    status: props?.initialValues?.status || "",
-    note: props?.initialValues?.note || "",
-    ...props?.initialValues,
+    name: props.initialValues?.name || "",
+    group: props.initialValues?.group || "",
+    balance: props.initialValues?.balance || "",
+    status: props.initialValues?.status || "",
+    note: props.initialValues?.note || "",
+    id: props.initialValues?.id || "",
   }),
 })(AppModal);
 
 export default WithFormik;
 
 AppModal.defaultProps = {
-  initialValues: {
-    name: "",
-    group: "",
-    balance: "",
-    status: "",
-    note: "",
-  },
+  //useless, because we take props before proptypes.
+  // initialValues: {
+  //   name: "",
+  //   group: "",
+  //   balance: "",
+  //   status: "",
+  //   note: "",
+  //   id: "",
+  // },
   userGroups: [],
   modalLoading: false,
   primaryButtonText: "",
