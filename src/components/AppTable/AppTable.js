@@ -17,15 +17,15 @@ import {
 import styled from "styled-components";
 import { Edit16, Delete16 } from "@carbon/icons-react";
 import * as routes from "../../navigation/routes";
+import { removeIdFromRoute } from "../../functions/utilities";
 
 const AppTable = ({ users, headers, findAndSetCurrentUser, setEditModalOpen, setDeleteModalOpen, setAddModalOpen }) => {
-  const history = useHistory();
   const tableHeaders = () => headers.map(({ header }) => <TableHeader key={header}>{header}</TableHeader>);
   const tableCells = ({ id, name, group, balance, status, note }) => (
     <>
       <TableCell>
         <TableCellLink>
-          <Link className="table-link" target="_blank" to={`${routes.USER}${id}`}>{name}</Link>
+          <Link className="table-link" target="_blank" to={`${removeIdFromRoute(routes.USER)}${id}`}>{name}</Link>
         </TableCellLink>
       </TableCell>
       <TableCell>{group}</TableCell>

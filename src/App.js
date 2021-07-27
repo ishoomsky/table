@@ -24,7 +24,7 @@ function App() {
        <Switch>
          <Route exact path={routes.BASE_ROUTE} component={MainPage} />
          <Route exact path={routes.TABLE} component={TablePage} />
-         <Route path={`${routes.USER}:userId`} component={UserPage} />
+         <Route path={routes.USER} component={UserPage} />
        </Switch>
      </Router>
    );

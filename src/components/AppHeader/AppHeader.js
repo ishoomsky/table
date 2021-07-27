@@ -1,25 +1,35 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory, useRouteMatch } from "react-router-dom";
 import {
   Header,
   HeaderName,
   HeaderMenuButton,
-  HeaderNavigation,
-  HeaderMenuItem,
-  SideNav,
-  SideNavItems,
-  HeaderSideNavItems,
   HeaderGlobalAction,
 } from "carbon-components-react";
 import { ArrowLeft20 } from "@carbon/icons-react";
 import styled from "styled-components";
 
 import * as routes from '../../navigation/routes';
+import AppHeaderNavigation from "../AppHeaderNavigation";
+import AppHeaderSideNav from '../AppHeaderSideNav';
+
+const navItems = [
+  { name: routes.BASE_ROUTE_NAME, route: routes.BASE_ROUTE, }, 
+  { name: routes.TABLE_NAME, route: routes.TABLE },
+];
 
 const AppHeader = () => {
   const [sideBarExpanded, setSideBarExpanded] = useState(false);
+  const [isCurrentPageUser, setCurrentPageUser] = useState(false);
+
   const history = useHistory();
-  const { url } = useRouteMatch();
+  const { url, path } = useRouteMatch();
+
+  useEffect(() => {
+    if (routes.USER === path) {
+      setCurrentPageUser(true);
+    }
+  }, [url]);
 
   const moveToPage = (route) => {
     history.push(route);
@@ -32,74 +42,36 @@ const AppHeader = () => {
     window.close();
   }
 
-  const isCurrentPageHome = url === "/";
-  const isCurrentPageTable = /^\/table$/.test(url);
-  const isCurrentPageUser = /^\/table\//.test(url);
-
   return (
     <Header aria-label="IBA">
-      {!isCurrentPageUser && (
+      {isCurrentPageUser ? (
+        <NavButtonWrapper>
+          <HeaderGlobalAction aria-label="Search" onClick={moveBack}>
+            <ArrowLeft20 />
+          </HeaderGlobalAction>
+        </NavButtonWrapper>
+      ) : (
         <HeaderMenuButton
           aria-label="Open menu"
           onClick={() => setSideBarExpanded(!sideBarExpanded)}
         />
       )}
 
-      {isCurrentPageUser && (
-        <NavButtonWrapper>
-          <HeaderGlobalAction aria-label="Search" onClick={moveBack}>
-            <ArrowLeft20 />
-          </HeaderGlobalAction>
-        </NavButtonWrapper>
-      )}
       <HeaderName prefix="Simple">Table</HeaderName>
-      <HeaderNavigation aria-label="IBA">
-        {isCurrentPageUser && (
-          <HeaderGlobalAction aria-label="Search" onClick={moveBack}>
-            <ArrowLeft20 />
-          </HeaderGlobalAction>
-        )}
-        {!isCurrentPageUser && (
-          <>
-            <HeaderMenuItem
-              isCurrentPage={isCurrentPageHome}
-              onClick={() => moveToPage(routes.BASE_ROUTE)}
-            >
-              Home
-            </HeaderMenuItem>
-            <HeaderMenuItem
-              isCurrentPage={isCurrentPageTable}
-              onClick={() => moveToPage(routes.TABLE)}
-            >
-              Table
-            </HeaderMenuItem>
-          </>
-        )}
-      </HeaderNavigation>
+      <AppHeaderNavigation
+        isCurrentPageUser={isCurrentPageUser}
+        moveBack={moveBack}
+        navItems={navItems}
+        path={path}
+        moveToPage={moveToPage}
+      />
 
       {sideBarExpanded && (
-        <SideNav
-          aria-label="Side navigation"
-          expanded={true}
-          isPersistent={false}
-        >
-          <SideNavItems>
-            <HeaderSideNavItems>
-              <HeaderMenuItem
-                isCurrentPage={isCurrentPageHome}
-                onClick={() => sideBarMoveToPage(routes.BASE_ROUTE)}
-              >
-                Home
-              </HeaderMenuItem>
-              <HeaderMenuItem
-                isCurrentPage={isCurrentPageTable}
-                onClick={() => sideBarMoveToPage(routes.TABLE)}
-              >
-                Table
-              </HeaderMenuItem>
-            </HeaderSideNavItems>
-          </SideNavItems>
-        </SideNav>
+        <AppHeaderSideNav
+          navItems={navItems}
+          path={path}
+          sideBarMoveToPage={sideBarMoveToPage}
+        />
       )}
     </Header>
   );
